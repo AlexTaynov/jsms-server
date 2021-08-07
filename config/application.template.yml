@@ -1,0 +1,11 @@
+---
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/jsms_db
+    username: postgres
+    password: postgres
+
+#jwt:
+#  secret:
+#    access:
+#    refresh:
