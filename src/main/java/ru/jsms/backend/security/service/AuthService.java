@@ -14,6 +14,10 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.Map;
 
+import static ru.jsms.backend.security.enums.AuthExceptionCode.ACCOUNT_NOT_FOUND;
+import static ru.jsms.backend.security.enums.AuthExceptionCode.TOKEN_INVALID;
+import static ru.jsms.backend.security.enums.AuthExceptionCode.WRONG_PASSWORD;
+
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -24,14 +28,14 @@ public class AuthService {
 
     public JwtResponse login(@NonNull JwtRequest authRequest) {
         final User user = userService.getByLogin(authRequest.getLogin())
-                .orElseThrow(() -> new AuthException("Пользователь не найден"));
+                .orElseThrow(ACCOUNT_NOT_FOUND.getException());
         if (user.getPassword().equals(authRequest.getPassword())) {
             final String accessToken = jwtProvider.generateAccessToken(user);
             final String refreshToken = jwtProvider.generateRefreshToken(user);
             refreshStorage.put(user.getLogin(), refreshToken);
             return new JwtResponse(accessToken, refreshToken);
         } else {
-            throw new AuthException("Неправильный пароль");
+            throw WRONG_PASSWORD.getException();
         }
     }
 
@@ -42,7 +46,7 @@ public class AuthService {
             final String saveRefreshToken = refreshStorage.get(login);
             if (saveRefreshToken != null && saveRefreshToken.equals(refreshToken)) {
                 final User user = userService.getByLogin(login)
-                        .orElseThrow(() -> new AuthException("Пользователь не найден"));
+                        .orElseThrow(ACCOUNT_NOT_FOUND.getException());
                 final String accessToken = jwtProvider.generateAccessToken(user);
                 return new JwtResponse(accessToken, null);
             }
@@ -57,14 +61,14 @@ public class AuthService {
             final String saveRefreshToken = refreshStorage.get(login);
             if (saveRefreshToken != null && saveRefreshToken.equals(refreshToken)) {
                 final User user = userService.getByLogin(login)
-                        .orElseThrow(() -> new AuthException("Пользователь не найден"));
+                        .orElseThrow(ACCOUNT_NOT_FOUND.getException());
                 final String accessToken = jwtProvider.generateAccessToken(user);
                 final String newRefreshToken = jwtProvider.generateRefreshToken(user);
                 refreshStorage.put(user.getLogin(), newRefreshToken);
                 return new JwtResponse(accessToken, newRefreshToken);
             }
         }
-        throw new AuthException("Невалидный JWT токен");
+        throw TOKEN_INVALID.getException();
     }
 
     public JwtAuthentication getAuthInfo() {
