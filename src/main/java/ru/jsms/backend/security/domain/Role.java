@@ -1,19 +1,21 @@
 package ru.jsms.backend.security.domain;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 
 @RequiredArgsConstructor
+@Getter
 public enum Role implements GrantedAuthority {
 
     ADMIN("ADMIN"),
     USER("USER");
 
-    private final String vale;
+    private final String value;
 
     @Override
     public String getAuthority() {
-        return vale;
+        return value;
     }
 
 }

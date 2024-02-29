@@ -1,32 +1,27 @@
 package ru.jsms.backend.security.service;
 
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import ru.jsms.backend.security.domain.Role;
-import ru.jsms.backend.security.domain.User;
+import ru.jsms.backend.security.entity.User;
 import org.springframework.stereotype.Service;
+import ru.jsms.backend.security.repository.UserRepository;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
 
-    private final List<User> users;
+    private final UserRepository userRepository;
 
-    public UserService() {
-        this.users = List.of(
-                new User("anton", "1234", "Антон", "Иванов", Collections.singleton(Role.USER)),
-                new User("ivan", "12345", "Сергей", "Петров", Collections.singleton(Role.ADMIN))
-        );
+    public Optional<User> getById(Long id) {
+        return userRepository.findById(id);
     }
 
-    public Optional<User> getByLogin(@NonNull String login) {
-        return users.stream()
-                .filter(user -> login.equals(user.getLogin()))
-                .findFirst();
+    public User createUser(Long id, String password, Set<Role> roles) {
+        return userRepository.save(new User(id, password, roles));
     }
-
 }

@@ -18,6 +18,12 @@ public class AuthController {
 
     private final AuthService authService;
 
+    @PostMapping("/register")
+    public ResponseEntity<JwtResponse> register(@RequestBody JwtRequest authRequest) {
+        final JwtResponse token = authService.register(authRequest);
+        return ResponseEntity.ok(token);
+    }
+
     @PostMapping("/login")
     public ResponseEntity<JwtResponse> login(@RequestBody JwtRequest authRequest) {
         final JwtResponse token = authService.login(authRequest);

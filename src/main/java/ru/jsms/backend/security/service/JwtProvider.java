@@ -10,9 +10,10 @@ import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import ru.jsms.backend.security.domain.User;
+import ru.jsms.backend.security.entity.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import ru.jsms.backend.security.entity.RefreshToken;
 
 import javax.crypto.SecretKey;
 import java.security.Key;
@@ -41,23 +42,23 @@ public class JwtProvider {
         final Instant accessExpirationInstant = now.plusMinutes(5).atZone(ZoneId.systemDefault()).toInstant();
         final Date accessExpiration = Date.from(accessExpirationInstant);
         return Jwts.builder()
-                .setSubject(user.getLogin())
+                .setSubject(String.valueOf(user.getId()))
                 .setExpiration(accessExpiration)
                 .signWith(jwtAccessSecret)
                 .claim("roles", user.getRoles())
-                .claim("firstName", user.getFirstName())
                 .compact();
     }
 
-    public String generateRefreshToken(@NonNull User user) {
+    public RefreshToken generateRefreshToken(@NonNull User user) {
         final LocalDateTime now = LocalDateTime.now();
         final Instant refreshExpirationInstant = now.plusDays(30).atZone(ZoneId.systemDefault()).toInstant();
         final Date refreshExpiration = Date.from(refreshExpirationInstant);
-        return Jwts.builder()
-                .setSubject(user.getLogin())
+        String token = Jwts.builder()
+                .setSubject(String.valueOf(user.getId()))
                 .setExpiration(refreshExpiration)
                 .signWith(jwtRefreshSecret)
                 .compact();
+        return new RefreshToken(user.getId(), token, refreshExpirationInstant);
     }
 
     public boolean validateAccessToken(@NonNull String accessToken) {
