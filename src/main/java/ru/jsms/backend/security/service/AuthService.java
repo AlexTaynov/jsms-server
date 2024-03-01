@@ -48,9 +48,7 @@ public class AuthService {
     public JwtResponse login(@NonNull JwtRequest authRequest) {
         final User user = userService.getByEmail(authRequest.getEmail())
                 .orElseThrow(ACCOUNT_NOT_FOUND.getException());
-        String userPasswordEncoded = user.getPassword();
-        String authRequestPassword = authRequest.getPassword();
-        if (passwordEncoder.matches(authRequestPassword, userPasswordEncoded)) {
+        if (passwordEncoder.matches(authRequest.getPassword(), user.getPassword())) {
             final String accessToken = jwtProvider.generateAccessToken(user);
             RefreshToken refreshToken = jwtProvider.generateRefreshToken(user);
             refreshTokenRepository.save(refreshToken);

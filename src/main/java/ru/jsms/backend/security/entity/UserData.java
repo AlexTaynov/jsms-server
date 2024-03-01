@@ -1,5 +1,7 @@
 package ru.jsms.backend.security.entity;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,7 +16,9 @@ import javax.persistence.OneToOne;
 @Getter
 @Setter
 @NoArgsConstructor
+@Builder
 @Entity(name = "user_data")
+@AllArgsConstructor
 public class UserData {
     @Id
     @Column(name = "user_id")
@@ -28,10 +32,4 @@ public class UserData {
     private String email;
     private String firstName;
     private String secondName;
-
-    public UserData(String email, String firstName, String secondName) {
-        this.email = email;
-        this.firstName = firstName;
-        this.secondName = secondName;
-    }
 }

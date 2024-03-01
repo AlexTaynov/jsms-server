@@ -28,14 +28,16 @@ public class UserService {
     public User createUser(RegisterRequest registerRequest, Set<Role> roles) {
         String passwordEncoded = passwordEncoder.encode(registerRequest.getPassword());
         User user = userRepository.save(new User(passwordEncoded, roles));
-        user.setUserData(
-                new UserData(registerRequest.getEmail(), registerRequest.getFirstName(), registerRequest.getSecondName())
+        user.setUserData(UserData.builder()
+                .email(registerRequest.getEmail())
+                .firstName(registerRequest.getFirstName())
+                .secondName(registerRequest.getSecondName())
+                .build()
         );
         return user;
     }
 
     public Optional<User> getByEmail(String email) {
-        Optional<UserData> userData = userDataRepository.findByEmail(email);
-        return userData.map(UserData::getUser);
+        return userDataRepository.findByEmail(email).map(UserData::getUser);
     }
 }
