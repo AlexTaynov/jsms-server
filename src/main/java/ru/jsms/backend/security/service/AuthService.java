@@ -57,7 +57,7 @@ public class AuthService {
             final Claims claims = jwtProvider.getRefreshClaims(refreshToken);
             final Long userId = Long.valueOf(claims.getSubject());
             final RefreshToken saveRefreshToken = refreshTokenRepository.findById(userId)
-                    .orElseThrow(() -> new AuthException("Рефреш токен не найден"));
+                    .orElseThrow(TOKEN_INVALID.getException());
             if (saveRefreshToken.getToken().equals(refreshToken)) {
                 final User user = userService.getById(userId)
                         .orElseThrow(ACCOUNT_NOT_FOUND.getException());
@@ -73,7 +73,7 @@ public class AuthService {
             final Claims claims = jwtProvider.getRefreshClaims(refreshToken);
             final Long userId = Long.valueOf(claims.getSubject());
             final RefreshToken saveRefreshToken = refreshTokenRepository.findById(userId)
-                    .orElseThrow(() -> new AuthException("Рефреш токен не найден"));
+                    .orElseThrow(TOKEN_INVALID.getException());
             if (saveRefreshToken.getToken().equals(refreshToken)) {
                 final User user = userService.getById(userId)
                         .orElseThrow(ACCOUNT_NOT_FOUND.getException());
