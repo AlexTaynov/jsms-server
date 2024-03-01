@@ -13,6 +13,7 @@ public enum AuthExceptionCode {
     ACCOUNT_NOT_FOUND("account_not_found", "Пользователь не найден", HttpStatus.NOT_FOUND),
     WRONG_PASSWORD("wrong_password", "Неправильный пароль", HttpStatus.BAD_REQUEST),
     TOKEN_INVALID("token_invalid", "Невалидный токен", HttpStatus.BAD_REQUEST),
+    EMAIL_ALREADY_EXISTS("email_already_exists", "Пользователь с таким email уже существует", HttpStatus.BAD_REQUEST),
     ;
 
     private final String errorCode;

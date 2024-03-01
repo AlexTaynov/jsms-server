@@ -4,19 +4,22 @@ import io.jsonwebtoken.Claims;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.jsms.backend.security.domain.JwtAuthentication;
 import ru.jsms.backend.security.domain.JwtRequest;
 import ru.jsms.backend.security.domain.JwtResponse;
+import ru.jsms.backend.security.domain.RegisterRequest;
 import ru.jsms.backend.security.domain.Role;
 import ru.jsms.backend.security.entity.RefreshToken;
 import ru.jsms.backend.security.entity.User;
-import ru.jsms.backend.security.exception.AuthException;
 import ru.jsms.backend.security.repository.RefreshTokenRepository;
+import ru.jsms.backend.security.repository.UserDataRepository;
 
 import java.util.Set;
 
 import static ru.jsms.backend.security.enums.AuthExceptionCode.ACCOUNT_NOT_FOUND;
+import static ru.jsms.backend.security.enums.AuthExceptionCode.EMAIL_ALREADY_EXISTS;
 import static ru.jsms.backend.security.enums.AuthExceptionCode.TOKEN_INVALID;
 import static ru.jsms.backend.security.enums.AuthExceptionCode.WRONG_PASSWORD;
 
@@ -25,13 +28,16 @@ import static ru.jsms.backend.security.enums.AuthExceptionCode.WRONG_PASSWORD;
 public class AuthService {
 
     private final UserService userService;
+    private final UserDataRepository userDataRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtProvider jwtProvider;
+    private final PasswordEncoder passwordEncoder;
 
-    public JwtResponse register(@NonNull JwtRequest authRequest) {
-        if (userService.getById(authRequest.getLogin()).isPresent())
-            throw new AuthException("Пользователь с таким id уже существует");
-        User user = userService.createUser(authRequest.getLogin(), authRequest.getPassword(), Set.of(Role.USER));
+    public JwtResponse register(@NonNull RegisterRequest registerRequest) {
+        if (userDataRepository.findByEmail(registerRequest.getEmail()).isPresent()) {
+            throw EMAIL_ALREADY_EXISTS.getException();
+        }
+        User user = userService.createUser(registerRequest, Set.of(Role.USER));
 
         final String accessToken = jwtProvider.generateAccessToken(user);
         RefreshToken refreshToken = jwtProvider.generateRefreshToken(user);
@@ -40,16 +46,17 @@ public class AuthService {
     }
 
     public JwtResponse login(@NonNull JwtRequest authRequest) {
-        final User user = userService.getById(authRequest.getLogin())
+        final User user = userService.getByEmail(authRequest.getEmail())
                 .orElseThrow(ACCOUNT_NOT_FOUND.getException());
-        if (user.getPassword().equals(authRequest.getPassword())) {
+        String userPasswordEncoded = user.getPassword();
+        String authRequestPassword = authRequest.getPassword();
+        if (passwordEncoder.matches(authRequestPassword, userPasswordEncoded)) {
             final String accessToken = jwtProvider.generateAccessToken(user);
             RefreshToken refreshToken = jwtProvider.generateRefreshToken(user);
             refreshTokenRepository.save(refreshToken);
             return new JwtResponse(accessToken, refreshToken.getToken());
-        } else {
-            throw WRONG_PASSWORD.getException();
         }
+        throw WRONG_PASSWORD.getException();
     }
 
     public JwtResponse getAccessToken(@NonNull String refreshToken) {

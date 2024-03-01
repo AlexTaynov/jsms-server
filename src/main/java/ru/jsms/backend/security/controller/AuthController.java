@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.jsms.backend.security.domain.JwtRequest;
 import ru.jsms.backend.security.domain.JwtResponse;
 import ru.jsms.backend.security.domain.RefreshJwtRequest;
+import ru.jsms.backend.security.domain.RegisterRequest;
 import ru.jsms.backend.security.service.AuthService;
 
 @RestController
@@ -19,8 +20,8 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<JwtResponse> register(@RequestBody JwtRequest authRequest) {
-        final JwtResponse token = authService.register(authRequest);
+    public ResponseEntity<JwtResponse> register(@RequestBody RegisterRequest registerRequest) {
+        final JwtResponse token = authService.register(registerRequest);
         return ResponseEntity.ok(token);
     }
 
