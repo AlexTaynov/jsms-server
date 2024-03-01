@@ -38,23 +38,23 @@ public class AuthService {
             throw EMAIL_ALREADY_EXISTS.getException();
         }
         User user = userService.createUser(registerRequest, Set.of(Role.USER));
-
-        final String accessToken = jwtProvider.generateAccessToken(user);
-        RefreshToken refreshToken = jwtProvider.generateRefreshToken(user);
-        refreshTokenRepository.save(refreshToken);
-        return new JwtResponse(accessToken, refreshToken.getToken());
+        return buildJwtResponse(user);
     }
 
     public JwtResponse login(@NonNull JwtRequest authRequest) {
         final User user = userService.getByEmail(authRequest.getEmail())
                 .orElseThrow(ACCOUNT_NOT_FOUND.getException());
         if (passwordEncoder.matches(authRequest.getPassword(), user.getPassword())) {
-            final String accessToken = jwtProvider.generateAccessToken(user);
-            RefreshToken refreshToken = jwtProvider.generateRefreshToken(user);
-            refreshTokenRepository.save(refreshToken);
-            return new JwtResponse(accessToken, refreshToken.getToken());
+            return buildJwtResponse(user);
         }
         throw WRONG_PASSWORD.getException();
+    }
+
+    private JwtResponse buildJwtResponse(User user) {
+        final String accessToken = jwtProvider.generateAccessToken(user);
+        RefreshToken refreshToken = jwtProvider.generateRefreshToken(user);
+        refreshTokenRepository.save(refreshToken);
+        return new JwtResponse(accessToken, refreshToken.getToken());
     }
 
     public JwtResponse getAccessToken(@NonNull String refreshToken) {
