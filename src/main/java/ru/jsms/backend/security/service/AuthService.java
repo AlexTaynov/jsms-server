@@ -3,18 +3,17 @@ package ru.jsms.backend.security.service;
 import io.jsonwebtoken.Claims;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
 import ru.jsms.backend.security.domain.JwtAuthentication;
 import ru.jsms.backend.security.domain.JwtRequest;
 import ru.jsms.backend.security.domain.JwtResponse;
 import ru.jsms.backend.security.domain.Role;
-import ru.jsms.backend.security.entity.User;
 import ru.jsms.backend.security.entity.RefreshToken;
+import ru.jsms.backend.security.entity.User;
 import ru.jsms.backend.security.exception.AuthException;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
 import ru.jsms.backend.security.repository.RefreshTokenRepository;
 
-import java.util.List;
 import java.util.Set;
 
 import static ru.jsms.backend.security.enums.AuthExceptionCode.ACCOUNT_NOT_FOUND;

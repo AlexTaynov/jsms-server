@@ -1,15 +1,15 @@
 package ru.jsms.backend.security.filter;
 
-import ru.jsms.backend.security.service.JwtProvider;
-import ru.jsms.backend.security.service.JwtUtils;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import ru.jsms.backend.security.domain.JwtAuthentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.GenericFilterBean;
+import ru.jsms.backend.security.domain.JwtAuthentication;
+import ru.jsms.backend.security.service.JwtProvider;
+import ru.jsms.backend.security.service.JwtUtils;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;

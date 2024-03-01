@@ -1,13 +1,11 @@
 package ru.jsms.backend.security.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 import ru.jsms.backend.security.domain.Role;
 import ru.jsms.backend.security.entity.User;
-import org.springframework.stereotype.Service;
 import ru.jsms.backend.security.repository.UserRepository;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 

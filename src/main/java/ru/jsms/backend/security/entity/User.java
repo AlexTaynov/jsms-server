@@ -7,7 +7,10 @@ import lombok.Setter;
 import ru.jsms.backend.security.domain.Role;
 import ru.jsms.backend.security.entity.converter.RolesConverter;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Convert;
+import javax.persistence.Entity;
+import javax.persistence.Id;
 import java.util.Set;
 
 @Getter
