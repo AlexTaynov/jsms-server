@@ -4,7 +4,9 @@ spring:
     url: jdbc:postgresql://localhost:5432/jsms_db
     username: postgres
     password: postgres
-
+  mail:
+    username: username
+    password: password
 #jwt:
 #  secret:
 #    access:
