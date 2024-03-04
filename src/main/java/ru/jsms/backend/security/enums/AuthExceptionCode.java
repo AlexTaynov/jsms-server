@@ -14,8 +14,8 @@ public enum AuthExceptionCode {
     WRONG_PASSWORD("wrong_password", "Неправильный пароль", HttpStatus.BAD_REQUEST),
     TOKEN_INVALID("token_invalid", "Невалидный токен", HttpStatus.BAD_REQUEST),
     EMAIL_ALREADY_EXISTS("email_already_exists", "Пользователь с таким email уже существует", HttpStatus.BAD_REQUEST),
-    EMAIL_CODE_INVALID("email_code_invalid", "Невалидный код", HttpStatus.BAD_REQUEST),
-    EMAIL_CODE_EXPIRED("email_code_expired", "Истек срок действия кода", HttpStatus.BAD_REQUEST)
+    EMAIL_CODE_INVALID("email_code_invalid", "Код невалидный или истек срок действия",
+            HttpStatus.BAD_REQUEST)
     ;
 
     private final String errorCode;
