@@ -19,16 +19,16 @@ public class NotificationService {
     private final JavaMailSender mailSender;
 
     public void sendEmailConfirmationCode(EmailConfirmation emailConfirmation) {
-        SimpleMailMessage message = createMailMessage(emailConfirmation);
-        mailSender.send(message);
+        SimpleMailMessage message = buildEmailConfirmationMessage(emailConfirmation);
         log.info("На почту {} отправлено письмо: {}", message.getTo(), message.getText());
+        mailSender.send(message);
     }
 
-    private SimpleMailMessage createMailMessage(EmailConfirmation emailConfirmation) {
+    private SimpleMailMessage buildEmailConfirmationMessage(EmailConfirmation emailConfirmation) {
         SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
         simpleMailMessage.setFrom(sender);
         simpleMailMessage.setTo(emailConfirmation.getEmail());
-        simpleMailMessage.setSubject("Потверждение почты");
+        simpleMailMessage.setSubject("Подтверждение почты");
         simpleMailMessage.setText(
                 "Код подтверждения: " + emailConfirmation.getCode() + "\n" +
                 "Срок действия: " + emailConfirmation.getExpiryDate()

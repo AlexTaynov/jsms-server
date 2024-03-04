@@ -47,12 +47,6 @@ public class CommonExceptionHandler {
         return new ResponseEntity<>(apiError, HttpStatus.BAD_REQUEST);
     }
 
-    private String buildDescription(MethodArgumentNotValidException ex) {
-        List<FieldError> errors = ex.getBindingResult().getFieldErrors();
-        return errors.stream().map(e -> e.getField() + ": " + e.getDefaultMessage())
-                .collect(Collectors.joining("; "));
-    }
-
     @ExceptionHandler(ApiException.class)
     public ResponseEntity<ErrorDto> handleApiException(ApiException ex) {
         log.error(ex.toString(), ex);
@@ -75,5 +69,11 @@ public class CommonExceptionHandler {
                 .description(ex.getMessage())
                 .build();
         return new ResponseEntity<>(apiError, HttpStatus.FORBIDDEN);
+    }
+
+    private String buildDescription(MethodArgumentNotValidException ex) {
+        List<FieldError> errors = ex.getBindingResult().getFieldErrors();
+        return errors.stream().map(e -> e.getField() + ": " + e.getDefaultMessage())
+                .collect(Collectors.joining("; "));
     }
 }
