@@ -12,6 +12,8 @@ import ru.jsms.backend.security.domain.RefreshJwtRequest;
 import ru.jsms.backend.security.domain.RegisterRequest;
 import ru.jsms.backend.security.service.AuthService;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
@@ -20,12 +22,12 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<JwtResponse> register(@RequestBody RegisterRequest registerRequest) {
+    public ResponseEntity<JwtResponse> register(@Valid @RequestBody RegisterRequest registerRequest) {
         return ResponseEntity.ok(authService.register(registerRequest));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<JwtResponse> login(@RequestBody JwtRequest authRequest) {
+    public ResponseEntity<JwtResponse> login(@Valid @RequestBody JwtRequest authRequest) {
         return ResponseEntity.ok(authService.login(authRequest));
     }
 

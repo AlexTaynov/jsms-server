@@ -12,6 +12,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
+import static ru.jsms.backend.security.enums.AuthExceptionCode.EMAIL_ALREADY_CONFIRMED;
 import static ru.jsms.backend.security.enums.AuthExceptionCode.EMAIL_CODE_INVALID;
 
 @Service
@@ -27,6 +28,12 @@ public class EmailConfirmationService {
 
     public void sendCode(Long userId) {
         UserData userData = userDataRepository.findById(userId).get();
+        emailConfirmationRepository.findById(userData.getEmail())
+                .map(EmailConfirmation::isConfirmed)
+                .filter(isConfirmed -> isConfirmed)
+                .ifPresent(s -> {
+                    throw EMAIL_ALREADY_CONFIRMED.getException();
+                });
         EmailConfirmation emailConfirmation = EmailConfirmation.builder()
                 .email(userData.getEmail())
                 .code(UUID.randomUUID())
