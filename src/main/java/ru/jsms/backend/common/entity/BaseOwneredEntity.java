@@ -1,8 +1,11 @@
 package ru.jsms.backend.common.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -15,12 +18,17 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@SuperBuilder
 @MappedSuperclass
-public abstract class BaseEntity<ID extends Serializable> {
+public abstract class BaseOwneredEntity<ID extends Serializable> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected ID id;
+
+    protected Long ownerId;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @CreationTimestamp

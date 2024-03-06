@@ -1,8 +1,7 @@
 package ru.jsms.backend.articles.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,12 +15,10 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.jsms.backend.articles.dto.request.CreateOfferArticleRequest;
 import ru.jsms.backend.articles.dto.request.EditOfferArticleRequest;
 import ru.jsms.backend.articles.dto.response.OfferArticleResponse;
-import ru.jsms.backend.articles.entity.OfferArticle;
 import ru.jsms.backend.articles.service.OfferArticleService;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/offerArticles")
@@ -32,43 +29,28 @@ public class OfferArticleController {
     private final OfferArticleService offerArticleService;
 
     @GetMapping
-    public List<OfferArticleResponse> getOfferArticles(
+    public ResponseEntity<List<OfferArticleResponse>> getOfferArticles(
             @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer size
     ) {
-        Pageable pageable;
-        if (page != null && size != null) {
-            pageable = PageRequest.of(page, size);
-        }
-        else {
-            pageable = Pageable.unpaged();
-        }
-        return offerArticleService.getOfferArticles(pageable).stream()
-                .map(this::convertOfferArticleToResponse)
-                .collect(Collectors.toList());
+        return ResponseEntity.ok(offerArticleService.getOfferArticles(page, size));
     }
 
     @PostMapping
-    public OfferArticleResponse createOfferArticle(@Valid @RequestBody CreateOfferArticleRequest request) {
-        return convertOfferArticleToResponse(offerArticleService.createOfferArticle(request));
+    public ResponseEntity<OfferArticleResponse> createOfferArticle(
+            @Valid @RequestBody CreateOfferArticleRequest request) {
+        return ResponseEntity.ok(offerArticleService.createOfferArticle(request));
     }
 
     @DeleteMapping("/{id}")
-    public void deleteOfferArticle(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteOfferArticle(@PathVariable Long id) {
         offerArticleService.deleteOfferArticle(id);
+        return ResponseEntity.ok().build();
     }
 
     @PutMapping("/{id}")
-    public OfferArticleResponse editOfferArticle(@PathVariable Long id,
+    public ResponseEntity<OfferArticleResponse> editOfferArticle(@PathVariable Long id,
                                                  @Valid @RequestBody EditOfferArticleRequest request) {
-        return convertOfferArticleToResponse(offerArticleService.editOfferArticle(id, request));
-    }
-
-    private OfferArticleResponse convertOfferArticleToResponse(OfferArticle offerArticle) {
-        return OfferArticleResponse.builder()
-                .id(offerArticle.getId())
-                .name(offerArticle.getName())
-                .status(offerArticle.getStatus().toString())
-                .build();
+        return ResponseEntity.ok(offerArticleService.editOfferArticle(id, request));
     }
 }

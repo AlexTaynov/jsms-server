@@ -5,10 +5,10 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import ru.jsms.backend.articles.enums.OfferArticleStatus;
-import ru.jsms.backend.common.entity.BaseEntity;
+import ru.jsms.backend.common.entity.BaseOwneredEntity;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -18,13 +18,10 @@ import javax.persistence.Table;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@SuperBuilder
 @Entity
 @Table(name = "offer_article")
-public class OfferArticle extends BaseEntity<Long> {
-
-    @Column(name = "owner_id")
-    private Long ownerId;
+public class OfferArticle extends BaseOwneredEntity<Long> {
 
     private String name;
 
