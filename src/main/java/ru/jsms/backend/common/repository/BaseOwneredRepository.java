@@ -18,6 +18,10 @@ import java.util.Optional;
 public interface BaseOwneredRepository<T extends BaseOwneredEntity<ID>, ID extends Serializable>
         extends PagingAndSortingRepository<T, ID> {
 
+    @Transactional(readOnly = true)
+    @Query("select e from #{#entityName} e where e.ownerId = ?1 and e.deleted = false")
+    List<T> findByOwnerId(Long ownerId, Pageable pageable);
+
     @Override
     @Transactional(readOnly = true)
     @Query("select e from #{#entityName} e where e.id = ?1 and e.deleted = false")
