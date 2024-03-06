@@ -10,15 +10,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.jsms.backend.articles.dto.request.CreateOfferArticleRequest;
 import ru.jsms.backend.articles.dto.request.EditOfferArticleRequest;
+import ru.jsms.backend.common.dto.PageParam;
 import ru.jsms.backend.articles.dto.response.OfferArticleResponse;
+import ru.jsms.backend.common.dto.PageDto;
 import ru.jsms.backend.articles.service.OfferArticleService;
 
 import javax.validation.Valid;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/offerArticles")
@@ -29,11 +29,8 @@ public class OfferArticleController {
     private final OfferArticleService offerArticleService;
 
     @GetMapping
-    public ResponseEntity<List<OfferArticleResponse>> getOfferArticles(
-            @RequestParam(required = false) Integer page,
-            @RequestParam(required = false) Integer size
-    ) {
-        return ResponseEntity.ok(offerArticleService.getOfferArticles(page, size));
+    public ResponseEntity<PageDto<OfferArticleResponse>> getOfferArticles(PageParam pageParam) {
+        return ResponseEntity.ok(offerArticleService.getOfferArticles(pageParam));
     }
 
     @PostMapping

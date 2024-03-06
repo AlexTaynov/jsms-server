@@ -9,6 +9,7 @@ import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -32,6 +33,7 @@ public abstract class BaseOwneredEntity<ID extends Serializable> {
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @CreationTimestamp
+    @Column(updatable = false)
     protected LocalDateTime created;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")

@@ -11,8 +11,8 @@ import java.text.MessageFormat;
 @AllArgsConstructor
 public enum ArticleExceptionCode {
     ACCESS_DENIED("access_denied", "Доступ запрещен", HttpStatus.FORBIDDEN),
-    EDIT_DENIED("edit_denied", "Разрешено удалять или редактировать заявку только со статусом DRAFT",
-            HttpStatus.FORBIDDEN);
+    EDIT_DENIED("edit_denied", "Заявка уже отправлена", HttpStatus.FORBIDDEN),
+    ARTICLE_NOT_FOUND("article_not_found", "Заявка не найдена", HttpStatus.NOT_FOUND);
 
     private final String errorCode;
     private final String message;

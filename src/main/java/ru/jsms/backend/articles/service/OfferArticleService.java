@@ -1,21 +1,19 @@
 package ru.jsms.backend.articles.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.jsms.backend.articles.dto.request.CreateOfferArticleRequest;
 import ru.jsms.backend.articles.dto.request.EditOfferArticleRequest;
+import ru.jsms.backend.common.dto.PageParam;
 import ru.jsms.backend.articles.dto.response.OfferArticleResponse;
+import ru.jsms.backend.common.dto.PageDto;
 import ru.jsms.backend.articles.entity.OfferArticle;
 import ru.jsms.backend.articles.enums.OfferArticleStatus;
 import ru.jsms.backend.articles.repository.OfferArticleRepository;
 import ru.jsms.backend.profile.service.AuthService;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import static ru.jsms.backend.articles.enums.ArticleExceptionCode.ACCESS_DENIED;
+import static ru.jsms.backend.articles.enums.ArticleExceptionCode.ARTICLE_NOT_FOUND;
 import static ru.jsms.backend.articles.enums.ArticleExceptionCode.EDIT_DENIED;
 
 @RequiredArgsConstructor
@@ -25,18 +23,10 @@ public class OfferArticleService {
     private final OfferArticleRepository offerArticleRepository;
     private final AuthService authService;
 
-    public List<OfferArticleResponse> getOfferArticles(Integer page, Integer size) {
+    public PageDto<OfferArticleResponse> getOfferArticles(PageParam pageParam) {
         final Long userId = (Long) authService.getAuthInfo().getPrincipal();
-        Pageable pageable;
-        if (page != null && size != null) {
-            pageable = PageRequest.of(page, size);
-        }
-        else {
-            pageable = Pageable.unpaged();
-        }
-        return offerArticleRepository.findByOwnerId(userId, pageable).stream()
-                .map(this::convertToResponse)
-                .collect(Collectors.toList());
+        return new PageDto<>(offerArticleRepository.findByOwnerId(userId, pageParam.toPageable())
+                .map(this::convertToResponse));
     }
 
     public OfferArticleResponse createOfferArticle(CreateOfferArticleRequest request) {
@@ -56,7 +46,7 @@ public class OfferArticleService {
     }
 
     public OfferArticleResponse editOfferArticle(Long id, EditOfferArticleRequest request) {
-        OfferArticle offerArticle = offerArticleRepository.findById(id).orElseThrow();
+        OfferArticle offerArticle = offerArticleRepository.findById(id).orElseThrow(ARTICLE_NOT_FOUND.getException());
         validateAccess(offerArticle);
         offerArticle.setName(request.getName());
         return convertToResponse(offerArticleRepository.save(offerArticle));

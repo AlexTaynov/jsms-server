@@ -20,7 +20,7 @@ public interface BaseOwneredRepository<T extends BaseOwneredEntity<ID>, ID exten
 
     @Transactional(readOnly = true)
     @Query("select e from #{#entityName} e where e.ownerId = ?1 and e.deleted = false")
-    List<T> findByOwnerId(Long ownerId, Pageable pageable);
+    Page<T> findByOwnerId(Long ownerId, Pageable pageable);
 
     @Override
     @Transactional(readOnly = true)
@@ -64,20 +64,21 @@ public interface BaseOwneredRepository<T extends BaseOwneredEntity<ID>, ID exten
     }
 
     @Override
-    @Query("update #{#entityName} e set e.deleted = false where e.id = ?1")
+    @Query("update #{#entityName} e set e.deleted = true where e.id = ?1")
     @Transactional
     @Modifying
     void deleteById(ID id);
 
-
     @Override
     @Transactional
+    @Modifying
     default void delete(T entity) {
         deleteById(entity.getId());
     }
 
     @Override
     @Transactional
+    @Modifying
     default void deleteAll(Iterable<? extends T> entities) {
         entities.forEach(entity -> deleteById(entity.getId()));
     }
