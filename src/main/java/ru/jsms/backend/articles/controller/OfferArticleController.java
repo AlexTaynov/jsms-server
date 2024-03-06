@@ -1,6 +1,8 @@
 package ru.jsms.backend.articles.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.jsms.backend.articles.dto.request.CreateOfferArticleRequest;
 import ru.jsms.backend.articles.dto.request.EditOfferArticleRequest;
@@ -29,8 +32,18 @@ public class OfferArticleController {
     private final OfferArticleService offerArticleService;
 
     @GetMapping
-    public List<OfferArticleResponse> getOfferArticles() {
-        return offerArticleService.getOfferArticles().stream()
+    public List<OfferArticleResponse> getOfferArticles(
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size
+    ) {
+        Pageable pageable;
+        if (page != null && size != null) {
+            pageable = PageRequest.of(page, size);
+        }
+        else {
+            pageable = Pageable.unpaged();
+        }
+        return offerArticleService.getOfferArticles(pageable).stream()
                 .map(this::convertOfferArticleToResponse)
                 .collect(Collectors.toList());
     }

@@ -1,5 +1,6 @@
 package ru.jsms.backend.articles.repository;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,5 +13,5 @@ import java.util.List;
 public interface OfferArticleRepository extends BaseRepository<OfferArticle, Long> {
     @Transactional(readOnly = true)
     @Query("select e from OfferArticle e where e.ownerId = ?1 and e.deleted = false")
-    List<OfferArticle> findByOwnerId(Long ownerId);
+    List<OfferArticle> findByOwnerId(Long ownerId, Pageable pageable);
 }

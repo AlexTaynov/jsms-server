@@ -1,9 +1,12 @@
 package ru.jsms.backend.common.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.NoRepositoryBean;
+import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.transaction.annotation.Transactional;
 import ru.jsms.backend.common.entity.BaseEntity;
 
@@ -13,7 +16,7 @@ import java.util.Optional;
 
 @NoRepositoryBean
 public interface BaseRepository<T extends BaseEntity<ID>, ID extends Serializable>
-        extends CrudRepository<T, ID> {
+        extends PagingAndSortingRepository<T, ID> {
 
     @Override
     @Transactional(readOnly = true)
@@ -24,6 +27,16 @@ public interface BaseRepository<T extends BaseEntity<ID>, ID extends Serializabl
     @Transactional(readOnly = true)
     @Query("select e from #{#entityName} e where e.deleted = false")
     List<T> findAll();
+
+    @Override
+    @Transactional(readOnly = true)
+    @Query("select e from #{#entityName} e where e.deleted = false")
+    Iterable<T> findAll(Sort sort);
+
+    @Override
+    @Transactional(readOnly = true)
+    @Query("select e from #{#entityName} e where e.deleted = false")
+    Page<T> findAll(Pageable pageable);
 
     @Override
     @Transactional(readOnly = true)

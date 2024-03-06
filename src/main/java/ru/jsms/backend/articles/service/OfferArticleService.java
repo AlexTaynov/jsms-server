@@ -1,6 +1,7 @@
 package ru.jsms.backend.articles.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.jsms.backend.articles.dto.request.CreateOfferArticleRequest;
 import ru.jsms.backend.articles.dto.request.EditOfferArticleRequest;
@@ -21,9 +22,9 @@ public class OfferArticleService {
     private final OfferArticleRepository offerArticleRepository;
     private final AuthService authService;
 
-    public List<OfferArticle> getOfferArticles() {
+    public List<OfferArticle> getOfferArticles(Pageable pageable) {
         final Long userId = (Long) authService.getAuthInfo().getPrincipal();
-        return offerArticleRepository.findByOwnerId(userId);
+        return offerArticleRepository.findByOwnerId(userId, pageable);
     }
 
     public OfferArticle createOfferArticle(CreateOfferArticleRequest request) {
