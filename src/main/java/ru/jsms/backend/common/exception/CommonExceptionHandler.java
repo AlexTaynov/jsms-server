@@ -5,12 +5,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import ru.jsms.backend.common.dto.ErrorDto;
-import ru.jsms.backend.common.exception.ApiException;
 import ru.jsms.backend.common.utils.RequestUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -59,8 +59,8 @@ public class CommonExceptionHandler {
         return new ResponseEntity<>(apiError, ex.getHttpStatus());
     }
 
-    @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<ErrorDto> handleApiException(AccessDeniedException ex) {
+    @ExceptionHandler(value = {AccessDeniedException.class, AuthenticationException.class})
+    public ResponseEntity<ErrorDto> handleAuthException(Exception ex) {
         log.error(ex.toString(), ex);
         final ErrorDto apiError = ErrorDto.builder()
                 .id(RequestUtils.getXRequestIdHeader(this.request))
