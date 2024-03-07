@@ -1,22 +1,22 @@
 {
 	"info": {
-		"_postman_id": "7be0f05f-b637-4296-a2ab-9ae2e622fa16",
-		"name": "JWT",
+		"_postman_id": "ac9c1043-1bd2-4c08-b8d5-07a6ae633de3",
+		"name": "jsms",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "16442716"
+		"_exporter_id": "25801388"
 	},
 	"item": [
 		{
-			"name": "Auth Service",
+			"name": "auth",
 			"item": [
 				{
-					"name": "Login User",
+					"name": "register",
 					"request": {
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"login\": \"anton\",\n    \"password\": \"1234\"\n}",
+							"raw": "{\r\n    \"email\": \"user@mail.ru\",\r\n    \"password\": \"Qwerty123!\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -24,8 +24,36 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8080/api/auth/login",
-							"protocol": "http",
+							"raw": "localhost:8080/api/auth/register",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"user@mail.ru\",\r\n    \"password\": \"Qwerty123!\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/auth/login",
 							"host": [
 								"localhost"
 							],
@@ -40,100 +68,56 @@
 					"response": []
 				},
 				{
-					"name": "Login Admin",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"login\": \"anton\",\n    \"password\": \"1234\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:8080/api/auth/login",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"api",
-								"auth",
-								"login"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get new access token",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"refreshToken\": \"eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhbnRvbiIsImV4cCI6MTY1ODM4NTcwMH0.35Xfw495acquYKcHKK2MrRU_dPlNqPQC7N3-vxA2d0zayWD1Ify6J-xYl5tWkm-8qdyXqPCri3uEfpzx1Lc7WA\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:8080/api/auth/token",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"api",
-								"auth",
-								"token"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get new access and refresh tokens",
+					"name": "sendCode",
 					"request": {
 						"auth": {
 							"type": "bearer",
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhbnRvbiIsImV4cCI6MTY1NTc5NDE2NCwicm9sZXMiOlsiVVNFUiJdLCJmaXJzdE5hbWUiOiLQkNC90YLQvtC9In0.hJ_j6BjysvP2Qv2Lt06m8FwE-U4AHRjVQ9BpBy6fJIycUDZxBSAhoeFucaOGFgukTMfICZbgEvna9OuwqYzzwQ",
+									"value": "{{authToken}}",
 									"type": "string"
 								}
 							]
 						},
 						"method": "POST",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"refreshToken\": \"eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhbnRvbiIsImV4cCI6MTY1ODM4NTg2NH0.gfE8Gr_1Sp_Um3vXG2EaDgqz6p9iLo1_wZgKksme13pg2q4cXVyShBtMTZ0ApfdcGzXcJ2MUoFHtTJCMj8ROUQ\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
 						"url": {
-							"raw": "http://localhost:8080/api/auth/refresh",
-							"protocol": "http",
+							"raw": "localhost:8080/api/email/sendCode",
 							"host": [
 								"localhost"
 							],
 							"port": "8080",
 							"path": [
 								"api",
-								"auth",
-								"refresh"
+								"email",
+								"sendCode"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "confirm",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/email/confirm?code=d66bda12-fdcc-49e6-88d6-4e52023b45c6",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"email",
+								"confirm"
+							],
+							"query": [
+								{
+									"key": "code",
+									"value": "d66bda12-fdcc-49e6-88d6-4e52023b45c6"
+								}
 							]
 						}
 					},
@@ -142,72 +126,185 @@
 			]
 		},
 		{
-			"name": "Service One",
+			"name": "articles",
 			"item": [
 				{
-					"name": "Hello User Request",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhbnRvbiIsImV4cCI6MTY1NTc5NTEyMCwicm9sZXMiOlsiVVNFUiJdLCJmaXJzdE5hbWUiOiLQkNC90YLQvtC9In0.tLFtJ0oPLq493u7EJe2Tb4kLxAFGCYgIWrmMq1XiHNhihbh2sV9-yVQyXOFwIpArw4ReAuUoP-6F2B_6YYzx4Q",
-									"type": "string"
+					"name": "versions",
+					"item": [
+						{
+							"name": "create version",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"articleArchive\": \"article111\",\r\n    \"documentsArchive\": \"docs\",\r\n    \"comment\": \"comment\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8080/api/offerArticles/19/versions",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"offerArticles",
+										"19",
+										"versions"
+									]
 								}
-							]
+							},
+							"response": []
 						},
+						{
+							"name": "submit",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/api/offerArticles/versions/4/submit",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"offerArticles",
+										"versions",
+										"4",
+										"submit"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "get version",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/api/offerArticles/versions/5",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"offerArticles",
+										"versions",
+										"5"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "get All",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/api/offerArticles/10/versions",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"offerArticles",
+										"10",
+										"versions"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "edit version",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"articleArchive\": \"article\",\r\n    \"documentsArchive\": \"docs\",\r\n    \"comment\": \"comment\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8080/api/offerArticles/versions/2",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"offerArticles",
+										"versions",
+										"2"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete version",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/api/offerArticles/versions/2",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"offerArticles",
+										"versions",
+										"2"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "getArticles",
+					"request": {
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
 						"url": {
-							"raw": "http://localhost:8080/api/hello/user",
-							"protocol": "http",
+							"raw": "localhost:8080/api/offerArticles",
 							"host": [
 								"localhost"
 							],
 							"port": "8080",
 							"path": [
 								"api",
-								"hello",
-								"user"
+								"offerArticles"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "Hello Admin Request",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
+					"name": "Create article",
 					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhbnRvbiIsImV4cCI6MTY1NTc5MzYxNiwicm9sZXMiOlsiVVNFUiJdLCJmaXJzdE5hbWUiOiLQkNC90YLQvtC9In0.2JBqOWBOmO9a93nwiBgFvf6LvATMw-DALRlSwjFbshhu5RP110NIg5Aod_V0r1WtNDAbuzsHFxk7N-chy4sHQg",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
+						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "",
+							"raw": "{\r\n    \"name\": \"Статья19\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -215,111 +312,97 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8080/api/hello/admin",
-							"protocol": "http",
+							"raw": "localhost:8080/api/offerArticles",
 							"host": [
 								"localhost"
 							],
 							"port": "8080",
 							"path": [
 								"api",
-								"hello",
-								"admin"
+								"offerArticles"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Edit article",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Статья\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/offerArticles/8",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"offerArticles",
+								"8"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete article",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/offerArticles/19",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"offerArticles",
+								"19"
 							]
 						}
 					},
 					"response": []
 				}
-			]
-		},
-		{
-			"name": "Service Two",
-			"item": [
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "{{authToken}}",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
 				{
-					"name": "Hello User Request",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:8099/api/hello/user",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8099",
-							"path": [
-								"api",
-								"hello",
-								"user"
-							]
-						}
-					},
-					"response": []
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
 				},
 				{
-					"name": "Hello Admin Request",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhbnRvbiIsImV4cCI6MTY1NTc1NjQyNSwicm9sZXMiOlsiVVNFUiJdLCJmaXJzdE5hbWUiOiLQkNC90YLQvtC9In0.y40_c0QGAMzf3tq19UtfNHdYcU7KS_xCqzzxBDLeUMZ5ait7LfWbLv8hCHyKGNBHOYLuquu5ylTiNBT4DBgr3A",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:8099/api/hello/user",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8099",
-							"path": [
-								"api",
-								"hello",
-								"user"
-							]
-						}
-					},
-					"response": []
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
 				}
 			]
 		}
