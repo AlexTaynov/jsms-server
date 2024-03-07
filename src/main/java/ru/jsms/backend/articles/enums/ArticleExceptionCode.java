@@ -12,7 +12,13 @@ import java.text.MessageFormat;
 public enum ArticleExceptionCode {
     ACCESS_DENIED("access_denied", "Доступ запрещен", HttpStatus.FORBIDDEN),
     EDIT_DENIED("edit_denied", "Заявка уже отправлена", HttpStatus.FORBIDDEN),
-    ARTICLE_NOT_FOUND("article_not_found", "Заявка не найдена", HttpStatus.NOT_FOUND);
+    ARTICLE_NOT_FOUND("article_not_found", "Заявка не найдена", HttpStatus.NOT_FOUND),
+    VERSION_NOT_FOUND("version_not_found", "Версия заявки не найдена", HttpStatus.NOT_FOUND),
+    SINGLE_VERSION_DELETE("single_version_delete", "Нельзя удалить единственную версию заявки",
+            HttpStatus.BAD_REQUEST),
+    VERSION_NOT_COMPLETE("version_not_complete", "Необходимо приложить архив со статьей",
+            HttpStatus.BAD_REQUEST)
+    ;
 
     private final String errorCode;
     private final String message;
