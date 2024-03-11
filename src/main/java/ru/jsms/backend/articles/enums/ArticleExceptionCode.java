@@ -16,7 +16,9 @@ public enum ArticleExceptionCode {
     VERSION_NOT_FOUND("version_not_found", "Версия заявки не найдена", HttpStatus.NOT_FOUND),
     SINGLE_VERSION_DELETE("single_version_delete", "Нельзя удалить единственную версию заявки",
             HttpStatus.BAD_REQUEST),
-    VERSION_NOT_COMPLETE("version_not_complete", "Необходимо приложить архив со статьей",
+    VERSION_NOT_COMPLETE("version_not_complete", "Необходимо приложить архив со статьей и документами",
+            HttpStatus.BAD_REQUEST),
+    DRAFT_ALREADY_EXISTS("draft_already_exists", "У заявки может быть только один черновик",
             HttpStatus.BAD_REQUEST)
     ;
 

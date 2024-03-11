@@ -8,7 +8,6 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import ru.jsms.backend.common.entity.BaseOwneredEntity;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -24,10 +23,8 @@ import javax.persistence.Table;
 public class OfferArticleVersion extends BaseOwneredEntity<Long> {
 
     @ManyToOne
-    @JoinColumn(name = "offer_article_id", insertable = false, updatable = false)
+    @JoinColumn(name = "offer_article_id")
     private OfferArticle offerArticle;
-    @Column(name = "offer_article_id")
-    private Long offerArticleId;
 
     private String articleArchive;
 

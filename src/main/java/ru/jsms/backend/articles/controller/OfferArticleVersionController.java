@@ -34,9 +34,9 @@ public class OfferArticleVersionController {
         return ResponseEntity.ok(versionService.createVersion(offerArticleId, request));
     }
 
-    @PutMapping("/versions/{versionId}/submit")
-    public ResponseEntity<Void> submitVersion(@PathVariable Long versionId) {
-        versionService.submitVersion(versionId);
+    @PutMapping("/{offerArticleId}/versions/submit")
+    public ResponseEntity<Void> submitLastVersion(@PathVariable Long offerArticleId) {
+        versionService.submitLastVersion(offerArticleId);
         return ResponseEntity.ok().build();
     }
 
@@ -51,15 +51,15 @@ public class OfferArticleVersionController {
         return ResponseEntity.ok(versionService.getAllVersions(offerArticleId, pageParam));
     }
 
-    @PutMapping("/versions/{versionId}")
-    public ResponseEntity<OfferArticleVersionResponse> editVersion(@PathVariable Long versionId,
+    @PutMapping("/{offerArticleId}/versions")
+    public ResponseEntity<OfferArticleVersionResponse> editLastVersion(@PathVariable Long offerArticleId,
                                                        @Valid @RequestBody EditOfferArticleVersionRequest request) {
-        return ResponseEntity.ok(versionService.editVersion(versionId, request));
+        return ResponseEntity.ok(versionService.editLastVersion(offerArticleId, request));
     }
 
-    @DeleteMapping("/versions/{versionId}")
-    public ResponseEntity<Void> deleteVersion(@PathVariable Long versionId) {
-        versionService.deleteVersion(versionId);
+    @DeleteMapping("/{offerArticleId}/versions")
+    public ResponseEntity<Void> deleteLastVersion(@PathVariable Long offerArticleId) {
+        versionService.deleteLastVersion(offerArticleId);
         return ResponseEntity.ok().build();
     }
 }

@@ -1,5 +1,5 @@
 package ru.jsms.backend.articles.enums;
 
-public enum PublishingStatus {
+public enum OfferArticleStatus {
     DRAFT, UNDER_CONSIDERATION, ACCEPTED, PUBLISHED, REJECTED
 }
