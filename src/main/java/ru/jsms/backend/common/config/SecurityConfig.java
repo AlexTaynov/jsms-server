@@ -31,6 +31,7 @@ public class SecurityConfig {
                 .antMatchers(
                         "/api/auth/login",
                         "/api/auth/token",
+                        "/api/auth/refresh",
                         "/api/auth/register",
                         "/api/email/confirm"
                 )

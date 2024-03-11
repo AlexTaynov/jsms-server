@@ -71,7 +71,7 @@ public class AuthService {
                 return new JwtResponse(accessToken, null);
             }
         }
-        return new JwtResponse(null, null);
+        throw TOKEN_INVALID.getException();
     }
 
     public JwtResponse refresh(@NonNull String refreshToken) {
