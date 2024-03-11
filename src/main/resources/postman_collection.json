@@ -1,9 +1,9 @@
 {
 	"info": {
-		"_postman_id": "69ceebbc-2f0e-4fab-a9ec-4054fe229ee3",
+		"_postman_id": "936997e1-2deb-49df-8f0e-c6ea000a0434",
 		"name": "jsms",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "17649640"
+		"_exporter_id": "25801388"
 	},
 	"item": [
 		{
@@ -305,7 +305,7 @@
 								"method": "PUT",
 								"header": [],
 								"url": {
-									"raw": "localhost:8080/api/offerArticles/versions/4/submit",
+									"raw": "localhost:8080/api/offerArticles/19/versions/submit",
 									"host": [
 										"localhost"
 									],
@@ -313,8 +313,8 @@
 									"path": [
 										"api",
 										"offerArticles",
+										"19",
 										"versions",
-										"4",
 										"submit"
 									]
 								}
@@ -378,7 +378,7 @@
 									}
 								},
 								"url": {
-									"raw": "localhost:8080/api/offerArticles/versions/2",
+									"raw": "localhost:8080/api/offerArticles/10/versions",
 									"host": [
 										"localhost"
 									],
@@ -386,8 +386,8 @@
 									"path": [
 										"api",
 										"offerArticles",
-										"versions",
-										"2"
+										"10",
+										"versions"
 									]
 								}
 							},
@@ -399,7 +399,7 @@
 								"method": "DELETE",
 								"header": [],
 								"url": {
-									"raw": "localhost:8080/api/offerArticles/versions/2",
+									"raw": "localhost:8080/api/offerArticles/10/versions",
 									"host": [
 										"localhost"
 									],
@@ -407,8 +407,8 @@
 									"path": [
 										"api",
 										"offerArticles",
-										"versions",
-										"2"
+										"10",
+										"versions"
 									]
 								}
 							},
