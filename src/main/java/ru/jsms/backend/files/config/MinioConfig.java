@@ -3,38 +3,21 @@ package ru.jsms.backend.files.config;
 import io.minio.BucketExistsArgs;
 import io.minio.MakeBucketArgs;
 import io.minio.MinioClient;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import ru.jsms.backend.files.config.properties.MinioConfigProperties;
 
 @Configuration
 public class MinioConfig {
 
-    @Value("${minio.url}")
-    private String minioUrl;
-
-    @Value("${minio.username}")
-    private String minioUsername;
-
-    @Value("${minio.password}")
-    private String minioPassword;
-
-    @Value("${minio.bucket}")
-    private String minioBucket;
-
     @Bean
-    public MinioClient minioClient() throws Exception {
+    public MinioClient minioClient(MinioConfigProperties properties) throws Exception {
         MinioClient client = MinioClient.builder()
-                .endpoint(minioUrl)
-                .credentials(minioUsername, minioPassword)
+                .endpoint(properties.getUrl())
+                .credentials(properties.getUsername(), properties.getPassword())
                 .build();
-        if (!client.bucketExists(BucketExistsArgs.builder().bucket(minioBucket).build())) {
-            client.makeBucket(
-                    MakeBucketArgs
-                            .builder()
-                            .bucket(minioBucket)
-                            .build()
-            );
+        if (!client.bucketExists(BucketExistsArgs.builder().bucket(properties.getBucket()).build())) {
+            client.makeBucket(MakeBucketArgs.builder().bucket(properties.getBucket()).build());
         }
         return client;
     }
