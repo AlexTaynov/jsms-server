@@ -7,11 +7,14 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import ru.jsms.backend.common.entity.BaseOwneredEntity;
+import ru.jsms.backend.files.entity.FileMetadataEntity;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -26,9 +29,17 @@ public class OfferArticleVersion extends BaseOwneredEntity<Long> {
     @JoinColumn(name = "offer_article_id")
     private OfferArticle offerArticle;
 
-    private String articleArchive;
+    @ManyToOne
+    @JoinColumn(name = "article_archive_uuid", referencedColumnName = "uuid", insertable = false, updatable = false)
+    private FileMetadataEntity articleArchive;
+    @Column(name = "article_archive_uuid")
+    private UUID articleArchiveId;
 
-    private String documentsArchive;
+    @ManyToOne
+    @JoinColumn(name = "documents_archive_uuid", referencedColumnName = "uuid", insertable = false, updatable = false)
+    private FileMetadataEntity documentsArchive;
+    @Column(name = "documents_archive_uuid")
+    private UUID documentsArchiveId;
 
     private String comment;
 

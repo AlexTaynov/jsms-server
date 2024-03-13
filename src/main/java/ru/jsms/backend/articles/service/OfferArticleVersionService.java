@@ -14,8 +14,6 @@ import ru.jsms.backend.common.dto.PageDto;
 import ru.jsms.backend.common.dto.PageParam;
 import ru.jsms.backend.profile.service.AuthService;
 
-import java.util.Optional;
-
 import static ru.jsms.backend.articles.enums.ArticleExceptionCode.ACCESS_DENIED;
 import static ru.jsms.backend.articles.enums.ArticleExceptionCode.ARTICLE_NOT_FOUND;
 import static ru.jsms.backend.articles.enums.ArticleExceptionCode.DRAFT_ALREADY_EXISTS;
@@ -43,8 +41,8 @@ public class OfferArticleVersionService {
 
         OfferArticleVersion offerArticleVersion = OfferArticleVersion.builder()
                 .offerArticle(offerArticle)
-                .articleArchive(request.getArticleArchive())
-                .documentsArchive(request.getDocumentsArchive())
+                .articleArchiveId(request.getArticleArchiveId())
+                .documentsArchiveId(request.getDocumentsArchiveId())
                 .comment(request.getComment())
                 .ownerId(offerArticle.getOwnerId())
                 .build();
@@ -118,8 +116,8 @@ public class OfferArticleVersionService {
     private OfferArticleVersionResponse convertToResponse(OfferArticleVersion version) {
         return OfferArticleVersionResponse.builder()
                 .id(version.getId())
-                .articleArchive(version.getArticleArchive())
-                .documentsArchive(version.getDocumentsArchive())
+                .articleArchiveId(version.getArticleArchiveId())
+                .documentsArchiveId(version.getDocumentsArchiveId())
                 .comment(version.getComment())
                 .isDraft(version.isDraft())
                 .build();
@@ -132,8 +130,8 @@ public class OfferArticleVersionService {
     }
 
     private void mapRequestToVersion(EditOfferArticleVersionRequest request, OfferArticleVersion version) {
-        version.setArticleArchive(request.getArticleArchive());
-        version.setDocumentsArchive(request.getDocumentsArchive());
+        version.setArticleArchiveId(request.getArticleArchiveId());
+        version.setDocumentsArchiveId(request.getDocumentsArchiveId());
         version.setComment(request.getComment());
     }
 

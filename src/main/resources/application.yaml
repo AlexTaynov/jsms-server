@@ -13,6 +13,10 @@ spring:
       "mail.transport.protocol": smtp
       "mail.smtp.auth": true
       "mail.smtp.starttls.enable": true
+  servlet:
+   multipart:
+     max-file-size: 200MB
+     max-request-size: 215MB
 jwt:
   secret:
     access: qBTmv4oXFFR2GwjexDJ4t6fsIUIUhhXqlktXjXdkcyygs8nPVEwMfo29VDRRepYDVV5IkIxBMzr7OEHXEHd37w==
@@ -20,3 +24,5 @@ jwt:
 email:
   verification:
     ttl: 1440 # время жизни в минутах
+minio:
+  bucket: jsms
