@@ -27,13 +27,13 @@ public class OfferArticleService {
     private final AuthService authService;
 
     public PageDto<OfferArticleResponse> getOfferArticles(PageParam pageParam) {
-        final Long userId = (Long) authService.getAuthInfo().getPrincipal();
+        final Long userId = authService.getUserId();
         return new PageDto<>(offerArticleRepository.findByOwnerId(userId, pageParam.toPageable())
                 .map(this::convertToResponse));
     }
 
     public OfferArticleResponse createOfferArticle(CreateOfferArticleRequest request) {
-        final Long userId = (Long) authService.getAuthInfo().getPrincipal();
+        final Long userId = authService.getUserId();
         OfferArticle offerArticle = offerArticleRepository.save(
                 OfferArticle.builder()
                         .name(request.getName())
@@ -63,7 +63,7 @@ public class OfferArticleService {
     }
 
     public void validateAccess(OfferArticle offerArticle) {
-        final Long userId = (Long) authService.getAuthInfo().getPrincipal();
+        final Long userId = authService.getUserId();
         if (!offerArticle.getOwnerId().equals(userId)) {
             throw ACCESS_DENIED.getException();
         }
@@ -83,7 +83,7 @@ public class OfferArticleService {
     }
 
     private void createDefaultVersion(OfferArticle offerArticle) {
-        final Long userId = (Long) authService.getAuthInfo().getPrincipal();
+        final Long userId = authService.getUserId();
         versionRepository.save(
                 OfferArticleVersion.builder()
                         .offerArticle(offerArticle)

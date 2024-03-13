@@ -19,7 +19,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/files")
 @RequiredArgsConstructor
-@PreAuthorize("hasAuthority('USER')")
+@PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
 public class FileController {
 
     private final FileService fileService;

@@ -70,7 +70,7 @@ public class OfferArticleVersionService {
     }
 
     public PageDto<OfferArticleVersionResponse> getAllVersions(Long offerArticleId, PageParam pageParam) {
-        final Long userId = (Long) authService.getAuthInfo().getPrincipal();
+        final Long userId = authService.getUserId();
         return new PageDto<>(
                 versionRepository.findByOfferArticleIdAndOwnerId(offerArticleId, userId, pageParam.toPageable())
                         .map(this::convertToResponse)
@@ -101,7 +101,7 @@ public class OfferArticleVersionService {
     }
 
     public void validateAccess(OfferArticleVersion version) {
-        final Long userId = (Long) authService.getAuthInfo().getPrincipal();
+        final Long userId = authService.getUserId();
         if (!version.getOwnerId().equals(userId)) {
             throw ACCESS_DENIED.getException();
         }

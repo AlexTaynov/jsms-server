@@ -31,6 +31,7 @@ public class StorageService {
                             .bucket(minioBucket)
                             .object(uuid.toString())
                             .stream(file.getInputStream(), file.getSize(), 0)
+                            .contentType(file.getContentType())
                             .build()
             );
         } catch (Exception e) {

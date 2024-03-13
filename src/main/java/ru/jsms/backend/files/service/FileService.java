@@ -23,7 +23,7 @@ public class FileService {
     private final FileMetadataRepository fileMetadataRepository;
 
     public UUID save(MultipartFile file) {
-        Long userId = (Long) authService.getAuthInfo().getPrincipal();
+        Long userId = authService.getUserId();
         FileMetadataEntity fileMetadata = FileMetadataEntity.builder()
                 .uuid(UUID.randomUUID())
                 .name(file.getOriginalFilename())
@@ -47,7 +47,9 @@ public class FileService {
     }
 
     private void validateAccess(UUID uuid) {
-        Long userId = (Long) authService.getAuthInfo().getPrincipal();
+        if (authService.isAdmin())
+            return;
+        Long userId = authService.getUserId();
         FileMetadataEntity fileMetadata = fileMetadataRepository.findByUuid(uuid)
                 .orElseThrow(FILE_NOT_FOUND.getException());
         if (!userId.equals(fileMetadata.getOwnerId())) {

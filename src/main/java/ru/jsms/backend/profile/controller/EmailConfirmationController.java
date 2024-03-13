@@ -21,7 +21,7 @@ public class EmailConfirmationController {
 
     @PostMapping("/sendCode")
     public void sendEmailConfirmationCode() {
-        final Long userId = (Long) authService.getAuthInfo().getPrincipal();
+        final Long userId = authService.getUserId();
         emailConfirmationService.sendCode(userId);
     }
 
