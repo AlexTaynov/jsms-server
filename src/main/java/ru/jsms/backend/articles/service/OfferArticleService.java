@@ -14,9 +14,9 @@ import ru.jsms.backend.common.dto.PageDto;
 import ru.jsms.backend.common.dto.PageParam;
 import ru.jsms.backend.profile.service.AuthService;
 
-import static ru.jsms.backend.articles.enums.ArticleExceptionCode.ACCESS_DENIED;
 import static ru.jsms.backend.articles.enums.ArticleExceptionCode.ARTICLE_NOT_FOUND;
 import static ru.jsms.backend.articles.enums.ArticleExceptionCode.EDIT_DENIED;
+import static ru.jsms.backend.common.utils.BaseOwneredEntityUtils.validateAccess;
 
 @RequiredArgsConstructor
 @Service
@@ -24,16 +24,15 @@ public class OfferArticleService {
 
     private final OfferArticleRepository offerArticleRepository;
     private final OfferArticleVersionRepository versionRepository;
-    private final AuthService authService;
 
     public PageDto<OfferArticleResponse> getOfferArticles(PageParam pageParam) {
-        final Long userId = (Long) authService.getAuthInfo().getPrincipal();
+        final Long userId = AuthService.getUserId();
         return new PageDto<>(offerArticleRepository.findByOwnerId(userId, pageParam.toPageable())
                 .map(this::convertToResponse));
     }
 
     public OfferArticleResponse createOfferArticle(CreateOfferArticleRequest request) {
-        final Long userId = (Long) authService.getAuthInfo().getPrincipal();
+        final Long userId = AuthService.getUserId();
         OfferArticle offerArticle = offerArticleRepository.save(
                 OfferArticle.builder()
                         .name(request.getName())
@@ -62,13 +61,6 @@ public class OfferArticleService {
         return convertToResponse(offerArticleRepository.save(offerArticle));
     }
 
-    public void validateAccess(OfferArticle offerArticle) {
-        final Long userId = (Long) authService.getAuthInfo().getPrincipal();
-        if (!offerArticle.getOwnerId().equals(userId)) {
-            throw ACCESS_DENIED.getException();
-        }
-    }
-
     public void validateEditAccess(OfferArticle offerArticle) {
         OfferArticleStatus status = offerArticle.getStatus();
         if (status != OfferArticleStatus.DRAFT && status != OfferArticleStatus.UNDER_CONSIDERATION) {
@@ -83,7 +75,7 @@ public class OfferArticleService {
     }
 
     private void createDefaultVersion(OfferArticle offerArticle) {
-        final Long userId = (Long) authService.getAuthInfo().getPrincipal();
+        final Long userId = AuthService.getUserId();
         versionRepository.save(
                 OfferArticleVersion.builder()
                         .offerArticle(offerArticle)

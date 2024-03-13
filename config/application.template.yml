@@ -7,6 +7,10 @@ spring:
   mail:
     username: username
     password: password
+minio:
+  url: http://localhost:9000
+  username: minio
+  password: minio_pass
 #jwt:
 #  secret:
 #    access:

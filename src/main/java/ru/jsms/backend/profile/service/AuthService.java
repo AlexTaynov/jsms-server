@@ -92,8 +92,15 @@ public class AuthService {
         throw TOKEN_INVALID.getException();
     }
 
-    public JwtAuthentication getAuthInfo() {
-        return (JwtAuthentication) SecurityContextHolder.getContext().getAuthentication();
+    public static Long getUserId() {
+        return (Long) getAuthInfo().getPrincipal();
     }
 
+    public static boolean isAdmin() {
+        return getAuthInfo().getAuthorities().contains(Role.ADMIN);
+    }
+
+    private static JwtAuthentication getAuthInfo() {
+        return (JwtAuthentication) SecurityContextHolder.getContext().getAuthentication();
+    }
 }

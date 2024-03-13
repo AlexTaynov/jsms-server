@@ -2,9 +2,11 @@ package ru.jsms.backend.articles.dto.request;
 
 import lombok.Data;
 
+import java.util.UUID;
+
 @Data
 public class CreateOfferArticleVersionRequest {
-    private String articleArchive;
-    private String documentsArchive;
+    private UUID articleArchiveId;
+    private UUID documentsArchiveId;
     private String comment;
 }

@@ -14,15 +14,13 @@ import ru.jsms.backend.common.dto.PageDto;
 import ru.jsms.backend.common.dto.PageParam;
 import ru.jsms.backend.profile.service.AuthService;
 
-import java.util.Optional;
-
-import static ru.jsms.backend.articles.enums.ArticleExceptionCode.ACCESS_DENIED;
 import static ru.jsms.backend.articles.enums.ArticleExceptionCode.ARTICLE_NOT_FOUND;
 import static ru.jsms.backend.articles.enums.ArticleExceptionCode.DRAFT_ALREADY_EXISTS;
 import static ru.jsms.backend.articles.enums.ArticleExceptionCode.EDIT_DENIED;
 import static ru.jsms.backend.articles.enums.ArticleExceptionCode.SINGLE_VERSION_DELETE;
 import static ru.jsms.backend.articles.enums.ArticleExceptionCode.VERSION_NOT_COMPLETE;
 import static ru.jsms.backend.articles.enums.ArticleExceptionCode.VERSION_NOT_FOUND;
+import static ru.jsms.backend.common.utils.BaseOwneredEntityUtils.validateAccess;
 
 @RequiredArgsConstructor
 @Service
@@ -31,20 +29,19 @@ public class OfferArticleVersionService {
     private final OfferArticleService offerArticleService;
     private final OfferArticleVersionRepository versionRepository;
     private final OfferArticleRepository offerArticleRepository;
-    private final AuthService authService;
 
     public OfferArticleVersionResponse createVersion(Long offerArticleId, CreateOfferArticleVersionRequest request) {
         OfferArticle offerArticle = offerArticleRepository.findById(offerArticleId)
                 .orElseThrow(ARTICLE_NOT_FOUND.getException());
-        offerArticleService.validateAccess(offerArticle);
+        validateAccess(offerArticle);
         offerArticleService.validateEditAccess(offerArticle);
 
         checkIfDraftVersionAlreadyExists(offerArticleId);
 
         OfferArticleVersion offerArticleVersion = OfferArticleVersion.builder()
                 .offerArticle(offerArticle)
-                .articleArchive(request.getArticleArchive())
-                .documentsArchive(request.getDocumentsArchive())
+                .articleArchiveId(request.getArticleArchiveId())
+                .documentsArchiveId(request.getDocumentsArchiveId())
                 .comment(request.getComment())
                 .ownerId(offerArticle.getOwnerId())
                 .build();
@@ -54,7 +51,7 @@ public class OfferArticleVersionService {
     public void submitLastVersion(Long offerArticleId) {
         OfferArticle offerArticle = offerArticleRepository.findById(offerArticleId)
                 .orElseThrow(ARTICLE_NOT_FOUND.getException());
-        offerArticleService.validateAccess(offerArticle);
+        validateAccess(offerArticle);
         offerArticleService.validateEditAccess(offerArticle);
 
         OfferArticleVersion version = versionRepository.findLastVersionByOfferArticleId(offerArticleId).get();
@@ -72,7 +69,7 @@ public class OfferArticleVersionService {
     }
 
     public PageDto<OfferArticleVersionResponse> getAllVersions(Long offerArticleId, PageParam pageParam) {
-        final Long userId = (Long) authService.getAuthInfo().getPrincipal();
+        final Long userId = AuthService.getUserId();
         return new PageDto<>(
                 versionRepository.findByOfferArticleIdAndOwnerId(offerArticleId, userId, pageParam.toPageable())
                         .map(this::convertToResponse)
@@ -102,13 +99,6 @@ public class OfferArticleVersionService {
         versionRepository.delete(version);
     }
 
-    public void validateAccess(OfferArticleVersion version) {
-        final Long userId = (Long) authService.getAuthInfo().getPrincipal();
-        if (!version.getOwnerId().equals(userId)) {
-            throw ACCESS_DENIED.getException();
-        }
-    }
-
     public void validateEditAccess(OfferArticleVersion version) {
         if (!version.isDraft()) {
             throw EDIT_DENIED.getException();
@@ -118,8 +108,8 @@ public class OfferArticleVersionService {
     private OfferArticleVersionResponse convertToResponse(OfferArticleVersion version) {
         return OfferArticleVersionResponse.builder()
                 .id(version.getId())
-                .articleArchive(version.getArticleArchive())
-                .documentsArchive(version.getDocumentsArchive())
+                .articleArchiveId(version.getArticleArchiveId())
+                .documentsArchiveId(version.getDocumentsArchiveId())
                 .comment(version.getComment())
                 .isDraft(version.isDraft())
                 .build();
@@ -132,8 +122,8 @@ public class OfferArticleVersionService {
     }
 
     private void mapRequestToVersion(EditOfferArticleVersionRequest request, OfferArticleVersion version) {
-        version.setArticleArchive(request.getArticleArchive());
-        version.setDocumentsArchive(request.getDocumentsArchive());
+        version.setArticleArchiveId(request.getArticleArchiveId());
+        version.setDocumentsArchiveId(request.getDocumentsArchiveId());
         version.setComment(request.getComment());
     }
 

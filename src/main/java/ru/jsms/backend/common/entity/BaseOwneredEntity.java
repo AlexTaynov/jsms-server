@@ -14,6 +14,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -29,6 +30,7 @@ public abstract class BaseOwneredEntity<ID extends Serializable> {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected ID id;
 
+    @NotNull
     protected Long ownerId;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")

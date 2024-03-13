@@ -16,12 +16,11 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class EmailConfirmationController {
 
-    private final AuthService authService;
     private final EmailConfirmationService emailConfirmationService;
 
     @PostMapping("/sendCode")
     public void sendEmailConfirmationCode() {
-        final Long userId = (Long) authService.getAuthInfo().getPrincipal();
+        final Long userId = AuthService.getUserId();
         emailConfirmationService.sendCode(userId);
     }
 
