@@ -24,16 +24,15 @@ public class OfferArticleService {
 
     private final OfferArticleRepository offerArticleRepository;
     private final OfferArticleVersionRepository versionRepository;
-    private final AuthService authService;
 
     public PageDto<OfferArticleResponse> getOfferArticles(PageParam pageParam) {
-        final Long userId = authService.getUserId();
+        final Long userId = AuthService.getUserId();
         return new PageDto<>(offerArticleRepository.findByOwnerId(userId, pageParam.toPageable())
                 .map(this::convertToResponse));
     }
 
     public OfferArticleResponse createOfferArticle(CreateOfferArticleRequest request) {
-        final Long userId = authService.getUserId();
+        final Long userId = AuthService.getUserId();
         OfferArticle offerArticle = offerArticleRepository.save(
                 OfferArticle.builder()
                         .name(request.getName())
@@ -76,7 +75,7 @@ public class OfferArticleService {
     }
 
     private void createDefaultVersion(OfferArticle offerArticle) {
-        final Long userId = authService.getUserId();
+        final Long userId = AuthService.getUserId();
         versionRepository.save(
                 OfferArticleVersion.builder()
                         .offerArticle(offerArticle)

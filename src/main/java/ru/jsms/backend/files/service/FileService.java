@@ -19,11 +19,10 @@ import static ru.jsms.backend.files.enums.FileExceptionCode.FILE_NOT_FOUND;
 public class FileService {
 
     private final StorageService storageService;
-    private final AuthService authService;
     private final FileMetadataRepository fileMetadataRepository;
 
     public UUID save(MultipartFile file) {
-        Long userId = authService.getUserId();
+        Long userId = AuthService.getUserId();
         FileMetadataEntity fileMetadata = FileMetadataEntity.builder()
                 .uuid(UUID.randomUUID())
                 .name(file.getOriginalFilename())
@@ -47,7 +46,7 @@ public class FileService {
     }
 
     private void validateAccess(UUID uuid) {
-        if (authService.isAdmin())
+        if (AuthService.isAdmin())
             return;
         FileMetadataEntity fileMetadata = fileMetadataRepository.findByUuid(uuid)
                 .orElseThrow(FILE_NOT_FOUND.getException());

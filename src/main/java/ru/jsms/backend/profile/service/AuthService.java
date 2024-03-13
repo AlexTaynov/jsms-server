@@ -92,15 +92,15 @@ public class AuthService {
         throw TOKEN_INVALID.getException();
     }
 
-    public Long getUserId() {
+    public static Long getUserId() {
         return (Long) getAuthInfo().getPrincipal();
     }
 
-    public boolean isAdmin() {
+    public static boolean isAdmin() {
         return getAuthInfo().getAuthorities().contains(Role.ADMIN);
     }
 
-    private JwtAuthentication getAuthInfo() {
+    private static JwtAuthentication getAuthInfo() {
         return (JwtAuthentication) SecurityContextHolder.getContext().getAuthentication();
     }
 }

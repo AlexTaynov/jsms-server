@@ -29,7 +29,6 @@ public class OfferArticleVersionService {
     private final OfferArticleService offerArticleService;
     private final OfferArticleVersionRepository versionRepository;
     private final OfferArticleRepository offerArticleRepository;
-    private final AuthService authService;
 
     public OfferArticleVersionResponse createVersion(Long offerArticleId, CreateOfferArticleVersionRequest request) {
         OfferArticle offerArticle = offerArticleRepository.findById(offerArticleId)
@@ -70,7 +69,7 @@ public class OfferArticleVersionService {
     }
 
     public PageDto<OfferArticleVersionResponse> getAllVersions(Long offerArticleId, PageParam pageParam) {
-        final Long userId = authService.getUserId();
+        final Long userId = AuthService.getUserId();
         return new PageDto<>(
                 versionRepository.findByOfferArticleIdAndOwnerId(offerArticleId, userId, pageParam.toPageable())
                         .map(this::convertToResponse)
