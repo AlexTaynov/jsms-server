@@ -12,9 +12,9 @@ import ru.jsms.backend.articles.repository.OfferArticleRepository;
 import ru.jsms.backend.articles.repository.OfferArticleVersionRepository;
 import ru.jsms.backend.common.dto.PageDto;
 import ru.jsms.backend.common.dto.PageParam;
+import ru.jsms.backend.common.utils.BaseOwneredEntityUtils;
 import ru.jsms.backend.profile.service.AuthService;
 
-import static ru.jsms.backend.articles.enums.ArticleExceptionCode.ACCESS_DENIED;
 import static ru.jsms.backend.articles.enums.ArticleExceptionCode.ARTICLE_NOT_FOUND;
 import static ru.jsms.backend.articles.enums.ArticleExceptionCode.DRAFT_ALREADY_EXISTS;
 import static ru.jsms.backend.articles.enums.ArticleExceptionCode.EDIT_DENIED;
@@ -34,7 +34,7 @@ public class OfferArticleVersionService {
     public OfferArticleVersionResponse createVersion(Long offerArticleId, CreateOfferArticleVersionRequest request) {
         OfferArticle offerArticle = offerArticleRepository.findById(offerArticleId)
                 .orElseThrow(ARTICLE_NOT_FOUND.getException());
-        offerArticleService.validateAccess(offerArticle);
+        BaseOwneredEntityUtils.validateAccess(offerArticle);
         offerArticleService.validateEditAccess(offerArticle);
 
         checkIfDraftVersionAlreadyExists(offerArticleId);
@@ -52,7 +52,7 @@ public class OfferArticleVersionService {
     public void submitLastVersion(Long offerArticleId) {
         OfferArticle offerArticle = offerArticleRepository.findById(offerArticleId)
                 .orElseThrow(ARTICLE_NOT_FOUND.getException());
-        offerArticleService.validateAccess(offerArticle);
+        BaseOwneredEntityUtils.validateAccess(offerArticle);
         offerArticleService.validateEditAccess(offerArticle);
 
         OfferArticleVersion version = versionRepository.findLastVersionByOfferArticleId(offerArticleId).get();
@@ -65,7 +65,7 @@ public class OfferArticleVersionService {
     public OfferArticleVersionResponse getVersion(Long versionId) {
         OfferArticleVersion version = versionRepository.findById(versionId)
                 .orElseThrow(VERSION_NOT_FOUND.getException());
-        validateAccess(version);
+        BaseOwneredEntityUtils.validateAccess(version);
         return convertToResponse(version);
     }
 
@@ -80,7 +80,7 @@ public class OfferArticleVersionService {
     public OfferArticleVersionResponse editLastVersion(Long offerArticleId, EditOfferArticleVersionRequest request) {
         OfferArticleVersion version = versionRepository.findLastVersionByOfferArticleId(offerArticleId)
                 .orElseThrow(VERSION_NOT_FOUND.getException());
-        validateAccess(version);
+        BaseOwneredEntityUtils.validateAccess(version);
         validateEditAccess(version);
 
         mapRequestToVersion(request, version);
@@ -92,19 +92,12 @@ public class OfferArticleVersionService {
                 versionRepository.findLastVersionByOfferArticleId(offerArticleId).orElse(null);
         if (version == null)
             return;
-        validateAccess(version);
+        BaseOwneredEntityUtils.validateAccess(version);
         validateEditAccess(version);
         if (versionRepository.countByOfferArticleId(offerArticleId) == 1) {
             throw SINGLE_VERSION_DELETE.getException();
         }
         versionRepository.delete(version);
-    }
-
-    public void validateAccess(OfferArticleVersion version) {
-        final Long userId = authService.getUserId();
-        if (!version.getOwnerId().equals(userId)) {
-            throw ACCESS_DENIED.getException();
-        }
     }
 
     public void validateEditAccess(OfferArticleVersion version) {

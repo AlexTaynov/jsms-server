@@ -12,9 +12,9 @@ import ru.jsms.backend.articles.repository.OfferArticleRepository;
 import ru.jsms.backend.articles.repository.OfferArticleVersionRepository;
 import ru.jsms.backend.common.dto.PageDto;
 import ru.jsms.backend.common.dto.PageParam;
+import ru.jsms.backend.common.utils.BaseOwneredEntityUtils;
 import ru.jsms.backend.profile.service.AuthService;
 
-import static ru.jsms.backend.articles.enums.ArticleExceptionCode.ACCESS_DENIED;
 import static ru.jsms.backend.articles.enums.ArticleExceptionCode.ARTICLE_NOT_FOUND;
 import static ru.jsms.backend.articles.enums.ArticleExceptionCode.EDIT_DENIED;
 
@@ -46,7 +46,7 @@ public class OfferArticleService {
 
     public void deleteOfferArticle(Long id) {
         offerArticleRepository.findById(id).ifPresent(o -> {
-            validateAccess(o);
+            BaseOwneredEntityUtils.validateAccess(o);
             validateDeleteAccess(o);
             versionRepository.deleteAll(o.getVersions());
             offerArticleRepository.delete(o);
@@ -55,18 +55,11 @@ public class OfferArticleService {
 
     public OfferArticleResponse editOfferArticle(Long id, EditOfferArticleRequest request) {
         OfferArticle offerArticle = offerArticleRepository.findById(id).orElseThrow(ARTICLE_NOT_FOUND.getException());
-        validateAccess(offerArticle);
+        BaseOwneredEntityUtils.validateAccess(offerArticle);
         validateEditAccess(offerArticle);
 
         offerArticle.setName(request.getName());
         return convertToResponse(offerArticleRepository.save(offerArticle));
-    }
-
-    public void validateAccess(OfferArticle offerArticle) {
-        final Long userId = authService.getUserId();
-        if (!offerArticle.getOwnerId().equals(userId)) {
-            throw ACCESS_DENIED.getException();
-        }
     }
 
     public void validateEditAccess(OfferArticle offerArticle) {

@@ -5,13 +5,13 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import ru.jsms.backend.common.utils.BaseOwneredEntityUtils;
 import ru.jsms.backend.files.entity.FileMetadataEntity;
 import ru.jsms.backend.files.repository.FileMetadataRepository;
 import ru.jsms.backend.profile.service.AuthService;
 
 import java.util.UUID;
 
-import static ru.jsms.backend.files.enums.FileExceptionCode.ACCESS_DENIED;
 import static ru.jsms.backend.files.enums.FileExceptionCode.FILE_NOT_FOUND;
 
 @Service
@@ -49,11 +49,8 @@ public class FileService {
     private void validateAccess(UUID uuid) {
         if (authService.isAdmin())
             return;
-        Long userId = authService.getUserId();
         FileMetadataEntity fileMetadata = fileMetadataRepository.findByUuid(uuid)
                 .orElseThrow(FILE_NOT_FOUND.getException());
-        if (!userId.equals(fileMetadata.getOwnerId())) {
-            throw ACCESS_DENIED.getException();
-        }
+        BaseOwneredEntityUtils.validateAccess(fileMetadata);
     }
 }
