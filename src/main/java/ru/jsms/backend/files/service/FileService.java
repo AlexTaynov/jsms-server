@@ -6,6 +6,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ru.jsms.backend.common.utils.BaseOwneredEntityUtils;
+import ru.jsms.backend.files.dto.FileDto;
 import ru.jsms.backend.files.entity.FileMetadataEntity;
 import ru.jsms.backend.files.repository.FileMetadataRepository;
 import ru.jsms.backend.profile.service.AuthService;
@@ -21,7 +22,7 @@ public class FileService {
     private final StorageService storageService;
     private final FileMetadataRepository fileMetadataRepository;
 
-    public UUID save(MultipartFile file) {
+    public FileDto save(MultipartFile file) {
         Long userId = AuthService.getUserId();
         FileMetadataEntity fileMetadata = FileMetadataEntity.builder()
                 .uuid(UUID.randomUUID())
@@ -31,7 +32,7 @@ public class FileService {
                 .build();
         fileMetadataRepository.save(fileMetadata);
         storageService.save(file, fileMetadata.getUuid());
-        return fileMetadata.getUuid();
+        return new FileDto(fileMetadata.getUuid(), fileMetadata.getName());
     }
 
     public String getFilename(UUID uuid) {
