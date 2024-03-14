@@ -38,5 +38,5 @@ public interface OfferArticleVersionRepository extends BaseOwneredRepository<Off
             and o.is_draft = false
             order by o.created desc limit 1
             """, nativeQuery = true)
-    Optional<OfferArticleVersion> findLastSubmittedVersion();
+    Optional<OfferArticleVersion> findLastSubmittedVersion(Long offerArticleId);
 }

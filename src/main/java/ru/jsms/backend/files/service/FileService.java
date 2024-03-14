@@ -42,11 +42,17 @@ public class FileService {
     }
 
     public Resource getFileResource(UUID uuid) {
-        validateAccess(uuid);
+        validateAccess(uuid.toString());
         return new InputStreamResource(storageService.getInputStream(uuid));
     }
 
-    public void validateAccess(UUID uuid) {
+    public void validateAccess(String uuidString) {
+        UUID uuid;
+        try {
+            uuid = UUID.fromString(uuidString);
+        } catch (IllegalArgumentException e) {
+            throw FILE_NOT_FOUND.getException();
+        }
         FileMetadataEntity fileMetadata = fileMetadataRepository.findByUuid(uuid)
                 .orElseThrow(FILE_NOT_FOUND.getException());
         if (headersDto.isAdmin())
