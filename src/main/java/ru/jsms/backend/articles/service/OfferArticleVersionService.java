@@ -10,9 +10,9 @@ import ru.jsms.backend.articles.entity.OfferArticleVersion;
 import ru.jsms.backend.articles.enums.OfferArticleStatus;
 import ru.jsms.backend.articles.repository.OfferArticleRepository;
 import ru.jsms.backend.articles.repository.OfferArticleVersionRepository;
+import ru.jsms.backend.common.dto.HeadersDto;
 import ru.jsms.backend.common.dto.PageDto;
 import ru.jsms.backend.common.dto.PageParam;
-import ru.jsms.backend.profile.service.AuthService;
 
 import static ru.jsms.backend.articles.enums.ArticleExceptionCode.ARTICLE_NOT_FOUND;
 import static ru.jsms.backend.articles.enums.ArticleExceptionCode.DRAFT_ALREADY_EXISTS;
@@ -30,11 +30,12 @@ public class OfferArticleVersionService {
     private final OfferArticleService offerArticleService;
     private final OfferArticleVersionRepository versionRepository;
     private final OfferArticleRepository offerArticleRepository;
+    private final HeadersDto headersDto;
 
     public OfferArticleVersionResponse createVersion(Long offerArticleId, CreateOfferArticleVersionRequest request) {
         OfferArticle offerArticle = offerArticleRepository.findById(offerArticleId)
                 .orElseThrow(ARTICLE_NOT_FOUND.getException());
-        validateAccess(offerArticle);
+        validateAccess(offerArticle, headersDto);
         offerArticleService.validateEditAccess(offerArticle);
 
         OfferArticleVersion lastVersion = versionRepository.findLastVersionByOfferArticleId(offerArticleId);
@@ -48,7 +49,7 @@ public class OfferArticleVersionService {
     public void submitLastVersion(Long offerArticleId) {
         OfferArticle offerArticle = offerArticleRepository.findById(offerArticleId)
                 .orElseThrow(ARTICLE_NOT_FOUND.getException());
-        validateAccess(offerArticle);
+        validateAccess(offerArticle, headersDto);
         offerArticleService.validateEditAccess(offerArticle);
 
         OfferArticleVersion version = versionRepository.findLastVersionByOfferArticleId(offerArticleId);
@@ -65,21 +66,21 @@ public class OfferArticleVersionService {
     public OfferArticleVersionResponse getVersion(Long versionId) {
         OfferArticleVersion version = versionRepository.findById(versionId)
                 .orElseThrow(VERSION_NOT_FOUND.getException());
-        validateAccess(version);
+        validateAccess(version, headersDto);
         return convertToResponse(version);
     }
 
     public PageDto<OfferArticleVersionResponse> getAllVersions(Long offerArticleId, PageParam pageParam) {
-        final Long userId = AuthService.getUserId();
         return new PageDto<>(
-                versionRepository.findByOfferArticleIdAndOwnerId(offerArticleId, userId, pageParam.toPageable())
+                versionRepository
+                        .findByOfferArticleIdAndOwnerId(offerArticleId, headersDto.getUserId(), pageParam.toPageable())
                         .map(this::convertToResponse)
         );
     }
 
     public OfferArticleVersionResponse editLastVersion(Long offerArticleId, EditOfferArticleVersionRequest request) {
         OfferArticleVersion version = versionRepository.findLastVersionByOfferArticleId(offerArticleId);
-        validateAccess(version);
+        validateAccess(version, headersDto);
         validateEditAccess(version);
 
         mapRequestToVersion(request, version);
@@ -88,7 +89,7 @@ public class OfferArticleVersionService {
 
     public void deleteLastVersion(Long offerArticleId) {
         OfferArticleVersion version = versionRepository.findLastVersionByOfferArticleId(offerArticleId);
-        validateAccess(version);
+        validateAccess(version, headersDto);
         validateEditAccess(version);
         if (versionRepository.countByOfferArticleId(offerArticleId) == 1) {
             throw SINGLE_VERSION_DELETE.getException();

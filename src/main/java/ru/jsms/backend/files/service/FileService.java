@@ -5,11 +5,11 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import ru.jsms.backend.common.dto.HeadersDto;
 import ru.jsms.backend.common.utils.BaseOwneredEntityUtils;
 import ru.jsms.backend.files.dto.FileDto;
 import ru.jsms.backend.files.entity.FileMetadataEntity;
 import ru.jsms.backend.files.repository.FileMetadataRepository;
-import ru.jsms.backend.profile.service.AuthService;
 
 import java.util.UUID;
 
@@ -21,14 +21,14 @@ public class FileService {
 
     private final StorageService storageService;
     private final FileMetadataRepository fileMetadataRepository;
+    private final HeadersDto headersDto;
 
     public FileDto save(MultipartFile file) {
-        Long userId = AuthService.getUserId();
         FileMetadataEntity fileMetadata = FileMetadataEntity.builder()
                 .uuid(UUID.randomUUID())
                 .name(file.getOriginalFilename())
                 .size(file.getSize())
-                .ownerId(userId)
+                .ownerId(headersDto.getUserId())
                 .build();
         fileMetadataRepository.save(fileMetadata);
         storageService.save(file, fileMetadata.getUuid());
@@ -47,10 +47,10 @@ public class FileService {
     }
 
     private void validateAccess(UUID uuid) {
-        if (AuthService.isAdmin())
+        if (headersDto.isAdmin())
             return;
         FileMetadataEntity fileMetadata = fileMetadataRepository.findByUuid(uuid)
                 .orElseThrow(FILE_NOT_FOUND.getException());
-        BaseOwneredEntityUtils.validateAccess(fileMetadata);
+        BaseOwneredEntityUtils.validateAccess(fileMetadata, headersDto);
     }
 }
