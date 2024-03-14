@@ -46,11 +46,11 @@ public class FileService {
         return new InputStreamResource(storageService.getInputStream(uuid));
     }
 
-    private void validateAccess(UUID uuid) {
-        if (headersDto.isAdmin())
-            return;
+    public void validateAccess(UUID uuid) {
         FileMetadataEntity fileMetadata = fileMetadataRepository.findByUuid(uuid)
                 .orElseThrow(FILE_NOT_FOUND.getException());
+        if (headersDto.isAdmin())
+            return;
         BaseOwneredEntityUtils.validateAccess(fileMetadata, headersDto.getUserId());
     }
 }

@@ -14,6 +14,7 @@ import ru.jsms.backend.articles.repository.OfferArticleVersionRepository;
 import ru.jsms.backend.common.dto.HeadersDto;
 import ru.jsms.backend.common.dto.PageDto;
 import ru.jsms.backend.common.dto.PageParam;
+import ru.jsms.backend.files.service.FileService;
 
 import static ru.jsms.backend.articles.enums.ArticleExceptionCode.ARTICLE_NOT_FOUND;
 import static ru.jsms.backend.articles.enums.ArticleExceptionCode.DRAFT_ALREADY_EXISTS;
@@ -31,6 +32,7 @@ public class OfferArticleVersionService {
     private final OfferArticleService offerArticleService;
     private final OfferArticleVersionRepository versionRepository;
     private final OfferArticleRepository offerArticleRepository;
+    private final FileService fileService;
     private final HeadersDto headersDto;
 
     public OfferArticleVersionResponse createVersion(Long offerArticleId, CreateOfferArticleVersionRequest request) {
@@ -38,6 +40,9 @@ public class OfferArticleVersionService {
                 .orElseThrow(ARTICLE_NOT_FOUND.getException());
         validateAccess(offerArticle, headersDto.getUserId());
         offerArticleService.validateEditAccess(offerArticle);
+
+        fileService.validateAccess(request.getArticleArchiveId());
+        fileService.validateAccess(request.getDocumentsArchiveId());
 
         OfferArticleVersion lastVersion = versionRepository.findLastVersionByOfferArticleId(offerArticleId);
         if (lastVersion.isDraft()) {
@@ -83,6 +88,9 @@ public class OfferArticleVersionService {
         OfferArticleVersion version = versionRepository.findLastVersionByOfferArticleId(offerArticleId);
         validateAccess(version, headersDto.getUserId());
         validateEditAccess(version);
+
+        fileService.validateAccess(request.getArticleArchiveId());
+        fileService.validateAccess(request.getDocumentsArchiveId());
 
         mapRequestToVersion(request, version);
         return convertToResponse(versionRepository.save(version));
