@@ -15,8 +15,8 @@ public class HeadersDto {
 
     private final User user;
     private final Long userId;
-    private boolean isAdmin;
-    private String ip;
+    private final boolean isAdmin;
+    private final String ip;
 
     public HeadersDto(HttpServletRequest request, UserRepository repository) {
         var authInfo = (JwtAuthentication) request.getUserPrincipal();

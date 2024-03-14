@@ -1,5 +1,6 @@
 package ru.jsms.backend.articles.service;
 
+import liquibase.repackaged.org.apache.commons.lang3.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.jsms.backend.articles.dto.request.CreateOfferArticleVersionRequest;
@@ -35,7 +36,7 @@ public class OfferArticleVersionService {
     public OfferArticleVersionResponse createVersion(Long offerArticleId, CreateOfferArticleVersionRequest request) {
         OfferArticle offerArticle = offerArticleRepository.findById(offerArticleId)
                 .orElseThrow(ARTICLE_NOT_FOUND.getException());
-        validateAccess(offerArticle, headersDto);
+        validateAccess(offerArticle, headersDto.getUserId());
         offerArticleService.validateEditAccess(offerArticle);
 
         OfferArticleVersion lastVersion = versionRepository.findLastVersionByOfferArticleId(offerArticleId);
@@ -49,14 +50,14 @@ public class OfferArticleVersionService {
     public void submitLastVersion(Long offerArticleId) {
         OfferArticle offerArticle = offerArticleRepository.findById(offerArticleId)
                 .orElseThrow(ARTICLE_NOT_FOUND.getException());
-        validateAccess(offerArticle, headersDto);
+        validateAccess(offerArticle, headersDto.getUserId());
         offerArticleService.validateEditAccess(offerArticle);
 
         OfferArticleVersion version = versionRepository.findLastVersionByOfferArticleId(offerArticleId);
         if (!version.isDraft()) {
             return;
         }
-        checkVersionIsCompleteAndDifferentFromPrevious(version);
+        validCompleteVersion(version);
 
         version.setDraft(false);
         updateStatusToConsideration(offerArticle);
@@ -66,7 +67,7 @@ public class OfferArticleVersionService {
     public OfferArticleVersionResponse getVersion(Long versionId) {
         OfferArticleVersion version = versionRepository.findById(versionId)
                 .orElseThrow(VERSION_NOT_FOUND.getException());
-        validateAccess(version, headersDto);
+        validateAccess(version, headersDto.getUserId());
         return convertToResponse(version);
     }
 
@@ -80,7 +81,7 @@ public class OfferArticleVersionService {
 
     public OfferArticleVersionResponse editLastVersion(Long offerArticleId, EditOfferArticleVersionRequest request) {
         OfferArticleVersion version = versionRepository.findLastVersionByOfferArticleId(offerArticleId);
-        validateAccess(version, headersDto);
+        validateAccess(version, headersDto.getUserId());
         validateEditAccess(version);
 
         mapRequestToVersion(request, version);
@@ -89,7 +90,7 @@ public class OfferArticleVersionService {
 
     public void deleteLastVersion(Long offerArticleId) {
         OfferArticleVersion version = versionRepository.findLastVersionByOfferArticleId(offerArticleId);
-        validateAccess(version, headersDto);
+        validateAccess(version, headersDto.getUserId());
         validateEditAccess(version);
         if (versionRepository.countByOfferArticleId(offerArticleId) == 1) {
             throw SINGLE_VERSION_DELETE.getException();
@@ -113,17 +114,18 @@ public class OfferArticleVersionService {
                 .build();
     }
 
-    private void checkVersionIsCompleteAndDifferentFromPrevious(OfferArticleVersion version) {
+    private void validCompleteVersion(OfferArticleVersion version) {
         if (version.getArticleArchive() == null || version.getDocumentsArchive() == null) {
             throw VERSION_NOT_COMPLETE.getException();
         }
-        OfferArticleVersion previousVersion = versionRepository.findPreviousVersion(version.getId()).orElse(null);
+        OfferArticleVersion previousVersion = versionRepository.findLastSubmittedVersion().orElse(null);
         if (previousVersion == null) {
             return;
         }
         if (version.getArticleArchiveId().equals(previousVersion.getArticleArchiveId()) &&
                 version.getDocumentsArchiveId().equals(previousVersion.getDocumentsArchiveId()) &&
-                (version.getComment() == null || version.getComment().equals(previousVersion.getComment()))
+                (StringUtils.isBlank(version.getComment()) ||
+                        StringUtils.equals(version.getComment(), previousVersion.getComment()))
         ) {
             throw VERSION_NOT_DIFFERENT.getException();
         }

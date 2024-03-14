@@ -47,7 +47,7 @@ public class OfferArticleService {
         if (offerArticle == null) {
             return;
         }
-        validateAccess(offerArticle, headersDto);
+        validateAccess(offerArticle, headersDto.getUserId());
         validateDeleteAccess(offerArticle);
         versionRepository.deleteAll(offerArticle.getVersions());
         offerArticleRepository.delete(offerArticle);
@@ -55,7 +55,7 @@ public class OfferArticleService {
 
     public OfferArticleResponse editOfferArticle(Long id, EditOfferArticleRequest request) {
         OfferArticle offerArticle = offerArticleRepository.findById(id).orElseThrow(ARTICLE_NOT_FOUND.getException());
-        validateAccess(offerArticle, headersDto);
+        validateAccess(offerArticle, headersDto.getUserId());
         validateEditAccess(offerArticle);
 
         offerArticle.setName(request.getName());

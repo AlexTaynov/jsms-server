@@ -51,6 +51,6 @@ public class FileService {
             return;
         FileMetadataEntity fileMetadata = fileMetadataRepository.findByUuid(uuid)
                 .orElseThrow(FILE_NOT_FOUND.getException());
-        BaseOwneredEntityUtils.validateAccess(fileMetadata, headersDto);
+        BaseOwneredEntityUtils.validateAccess(fileMetadata, headersDto.getUserId());
     }
 }
