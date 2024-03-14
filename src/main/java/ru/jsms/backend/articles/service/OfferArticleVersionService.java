@@ -19,6 +19,7 @@ import static ru.jsms.backend.articles.enums.ArticleExceptionCode.DRAFT_ALREADY_
 import static ru.jsms.backend.articles.enums.ArticleExceptionCode.EDIT_DENIED;
 import static ru.jsms.backend.articles.enums.ArticleExceptionCode.SINGLE_VERSION_DELETE;
 import static ru.jsms.backend.articles.enums.ArticleExceptionCode.VERSION_NOT_COMPLETE;
+import static ru.jsms.backend.articles.enums.ArticleExceptionCode.VERSION_NOT_DIFFERENT;
 import static ru.jsms.backend.articles.enums.ArticleExceptionCode.VERSION_NOT_FOUND;
 import static ru.jsms.backend.common.utils.BaseOwneredEntityUtils.validateAccess;
 
@@ -36,16 +37,12 @@ public class OfferArticleVersionService {
         validateAccess(offerArticle);
         offerArticleService.validateEditAccess(offerArticle);
 
-        checkIfDraftVersionAlreadyExists(offerArticleId);
-
-        OfferArticleVersion offerArticleVersion = OfferArticleVersion.builder()
-                .offerArticle(offerArticle)
-                .articleArchiveId(request.getArticleArchiveId())
-                .documentsArchiveId(request.getDocumentsArchiveId())
-                .comment(request.getComment())
-                .ownerId(offerArticle.getOwnerId())
-                .build();
-        return convertToResponse(versionRepository.save(offerArticleVersion));
+        OfferArticleVersion lastVersion = versionRepository.findLastVersionByOfferArticleId(offerArticleId);
+        if (lastVersion.isDraft()) {
+            throw DRAFT_ALREADY_EXISTS.getException();
+        }
+        OfferArticleVersion newVersion = buildNewVersion(lastVersion, request);
+        return convertToResponse(versionRepository.save(newVersion));
     }
 
     public void submitLastVersion(Long offerArticleId) {
@@ -54,8 +51,12 @@ public class OfferArticleVersionService {
         validateAccess(offerArticle);
         offerArticleService.validateEditAccess(offerArticle);
 
-        OfferArticleVersion version = versionRepository.findLastVersionByOfferArticleId(offerArticleId).get();
-        checkVersionIsComplete(version);
+        OfferArticleVersion version = versionRepository.findLastVersionByOfferArticleId(offerArticleId);
+        if (!version.isDraft()) {
+            return;
+        }
+        checkVersionIsCompleteAndDifferentFromPrevious(version);
+
         version.setDraft(false);
         updateStatusToConsideration(offerArticle);
         versionRepository.save(version);
@@ -77,8 +78,7 @@ public class OfferArticleVersionService {
     }
 
     public OfferArticleVersionResponse editLastVersion(Long offerArticleId, EditOfferArticleVersionRequest request) {
-        OfferArticleVersion version = versionRepository.findLastVersionByOfferArticleId(offerArticleId)
-                .orElseThrow(VERSION_NOT_FOUND.getException());
+        OfferArticleVersion version = versionRepository.findLastVersionByOfferArticleId(offerArticleId);
         validateAccess(version);
         validateEditAccess(version);
 
@@ -87,10 +87,7 @@ public class OfferArticleVersionService {
     }
 
     public void deleteLastVersion(Long offerArticleId) {
-        OfferArticleVersion version =
-                versionRepository.findLastVersionByOfferArticleId(offerArticleId).orElse(null);
-        if (version == null)
-            return;
+        OfferArticleVersion version = versionRepository.findLastVersionByOfferArticleId(offerArticleId);
         validateAccess(version);
         validateEditAccess(version);
         if (versionRepository.countByOfferArticleId(offerArticleId) == 1) {
@@ -115,10 +112,21 @@ public class OfferArticleVersionService {
                 .build();
     }
 
-    private void checkVersionIsComplete(OfferArticleVersion version) {
+    private void checkVersionIsCompleteAndDifferentFromPrevious(OfferArticleVersion version) {
         if (version.getArticleArchive() == null || version.getDocumentsArchive() == null) {
             throw VERSION_NOT_COMPLETE.getException();
         }
+        OfferArticleVersion previousVersion = versionRepository.findPreviousVersion(version.getId()).orElse(null);
+        if (previousVersion == null) {
+            return;
+        }
+        if (version.getArticleArchiveId().equals(previousVersion.getArticleArchiveId()) &&
+                version.getDocumentsArchiveId().equals(previousVersion.getDocumentsArchiveId()) &&
+                (version.getComment() == null || version.getComment().equals(previousVersion.getComment()))
+        ) {
+            throw VERSION_NOT_DIFFERENT.getException();
+        }
+
     }
 
     private void mapRequestToVersion(EditOfferArticleVersionRequest request, OfferArticleVersion version) {
@@ -127,17 +135,23 @@ public class OfferArticleVersionService {
         version.setComment(request.getComment());
     }
 
-    private void checkIfDraftVersionAlreadyExists(Long offerArticleId) {
-        versionRepository.findLastVersionByOfferArticleId(offerArticleId).ifPresent(version -> {
-            if (version.isDraft())
-                throw DRAFT_ALREADY_EXISTS.getException();
-        });
-    }
-
     private void updateStatusToConsideration(OfferArticle offerArticle) {
         if (offerArticle.getStatus() == OfferArticleStatus.DRAFT) {
             offerArticle.setStatus(OfferArticleStatus.UNDER_CONSIDERATION);
             offerArticleRepository.save(offerArticle);
         }
+    }
+
+    private OfferArticleVersion buildNewVersion(OfferArticleVersion lastVersion,
+                                                CreateOfferArticleVersionRequest request) {
+        OfferArticleVersion newVersion = lastVersion.toBuilder()
+                .id(null).comment(request.getComment()).isDraft(true).build();
+        if (request.getArticleArchiveId() != null) {
+            newVersion.setArticleArchiveId(request.getArticleArchiveId());
+        }
+        if (request.getDocumentsArchiveId() != null) {
+            newVersion.setDocumentsArchiveId(request.getDocumentsArchiveId());
+        }
+        return newVersion;
     }
 }

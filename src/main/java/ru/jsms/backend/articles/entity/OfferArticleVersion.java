@@ -20,7 +20,7 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@SuperBuilder
+@SuperBuilder(toBuilder = true)
 @Entity
 @Table(name = "offer_article_version")
 public class OfferArticleVersion extends BaseOwneredEntity<Long> {

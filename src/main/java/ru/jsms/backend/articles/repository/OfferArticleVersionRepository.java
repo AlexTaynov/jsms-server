@@ -20,9 +20,15 @@ public interface OfferArticleVersionRepository extends BaseOwneredRepository<Off
     @Transactional(readOnly = true)
     @Query(value = "select * from offer_article_version o where o.offer_article_id = ?1 and o.deleted = false " +
             "order by o.created desc limit 1", nativeQuery = true)
-    Optional<OfferArticleVersion> findLastVersionByOfferArticleId(Long offerArticleId);
+    OfferArticleVersion findLastVersionByOfferArticleId(Long offerArticleId);
 
     @Transactional(readOnly = true)
     @Query("select count(o) from OfferArticleVersion o where o.offerArticle.id = ?1 and o.deleted = false")
     Long countByOfferArticleId(Long offerArticleId);
+
+    @Transactional(readOnly = true)
+    @Query(value = "select * from offer_article_version o " +
+            "inner join offer_article_version v on o.offer_article_id = v.offer_article_id where v.id=? " +
+            "and o.created < v.created and o.deleted = false order by o.created desc limit 1", nativeQuery = true)
+    Optional<OfferArticleVersion> findPreviousVersion(Long versionId);
 }

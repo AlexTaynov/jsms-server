@@ -18,6 +18,8 @@ public enum ArticleExceptionCode {
             HttpStatus.BAD_REQUEST),
     VERSION_NOT_COMPLETE("version_not_complete", "Необходимо приложить архив со статьей и документами",
             HttpStatus.BAD_REQUEST),
+    VERSION_NOT_DIFFERENT("version_not_different", "Версия заявки не отличается от предыдущей",
+            HttpStatus.BAD_REQUEST),
     DRAFT_ALREADY_EXISTS("draft_already_exists", "У заявки может быть только один черновик",
             HttpStatus.BAD_REQUEST)
     ;
