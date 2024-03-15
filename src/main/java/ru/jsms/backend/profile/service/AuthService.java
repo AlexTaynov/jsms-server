@@ -3,19 +3,17 @@ package ru.jsms.backend.profile.service;
 import io.jsonwebtoken.Claims;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import ru.jsms.backend.common.dto.JwtAuthentication;
-import ru.jsms.backend.profile.dto.request.JwtRequest;
-import ru.jsms.backend.profile.dto.response.JwtResponse;
-import ru.jsms.backend.profile.dto.request.RegisterRequest;
 import ru.jsms.backend.common.dto.Role;
+import ru.jsms.backend.common.service.JwtProvider;
+import ru.jsms.backend.profile.dto.request.JwtRequest;
+import ru.jsms.backend.profile.dto.request.RegisterRequest;
+import ru.jsms.backend.profile.dto.response.JwtResponse;
 import ru.jsms.backend.profile.entity.RefreshToken;
 import ru.jsms.backend.profile.entity.User;
 import ru.jsms.backend.profile.repository.RefreshTokenRepository;
 import ru.jsms.backend.profile.repository.UserDataRepository;
-import ru.jsms.backend.common.service.JwtProvider;
 
 import java.util.Set;
 
@@ -90,17 +88,5 @@ public class AuthService {
             }
         }
         throw TOKEN_INVALID.getException();
-    }
-
-    public static Long getUserId() {
-        return (Long) getAuthInfo().getPrincipal();
-    }
-
-    public static boolean isAdmin() {
-        return getAuthInfo().getAuthorities().contains(Role.ADMIN);
-    }
-
-    private static JwtAuthentication getAuthInfo() {
-        return (JwtAuthentication) SecurityContextHolder.getContext().getAuthentication();
     }
 }

@@ -1,5 +1,6 @@
 package ru.jsms.backend.articles.service;
 
+import liquibase.repackaged.org.apache.commons.lang3.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.jsms.backend.articles.dto.request.CreateOfferArticleVersionRequest;
@@ -10,17 +11,20 @@ import ru.jsms.backend.articles.entity.OfferArticleVersion;
 import ru.jsms.backend.articles.enums.OfferArticleStatus;
 import ru.jsms.backend.articles.repository.OfferArticleRepository;
 import ru.jsms.backend.articles.repository.OfferArticleVersionRepository;
+import ru.jsms.backend.common.dto.HeadersDto;
 import ru.jsms.backend.common.dto.PageDto;
 import ru.jsms.backend.common.dto.PageParam;
-import ru.jsms.backend.profile.service.AuthService;
+import ru.jsms.backend.files.service.FileService;
 
 import static ru.jsms.backend.articles.enums.ArticleExceptionCode.ARTICLE_NOT_FOUND;
 import static ru.jsms.backend.articles.enums.ArticleExceptionCode.DRAFT_ALREADY_EXISTS;
 import static ru.jsms.backend.articles.enums.ArticleExceptionCode.EDIT_DENIED;
 import static ru.jsms.backend.articles.enums.ArticleExceptionCode.SINGLE_VERSION_DELETE;
 import static ru.jsms.backend.articles.enums.ArticleExceptionCode.VERSION_NOT_COMPLETE;
+import static ru.jsms.backend.articles.enums.ArticleExceptionCode.VERSION_NOT_DIFFERENT;
 import static ru.jsms.backend.articles.enums.ArticleExceptionCode.VERSION_NOT_FOUND;
 import static ru.jsms.backend.common.utils.BaseOwneredEntityUtils.validateAccess;
+import static ru.jsms.backend.common.utils.UuidUtils.parseUuid;
 
 @RequiredArgsConstructor
 @Service
@@ -29,33 +33,42 @@ public class OfferArticleVersionService {
     private final OfferArticleService offerArticleService;
     private final OfferArticleVersionRepository versionRepository;
     private final OfferArticleRepository offerArticleRepository;
+    private final FileService fileService;
+    private final HeadersDto headersDto;
 
     public OfferArticleVersionResponse createVersion(Long offerArticleId, CreateOfferArticleVersionRequest request) {
         OfferArticle offerArticle = offerArticleRepository.findById(offerArticleId)
                 .orElseThrow(ARTICLE_NOT_FOUND.getException());
-        validateAccess(offerArticle);
+        validateAccess(offerArticle, headersDto.getUserId());
         offerArticleService.validateEditAccess(offerArticle);
 
-        checkIfDraftVersionAlreadyExists(offerArticleId);
+        if (request.getArticleArchiveId() != null) {
+            fileService.validateAccess(request.getArticleArchiveId());
+        }
+        if (request.getDocumentsArchiveId() != null) {
+            fileService.validateAccess(request.getDocumentsArchiveId());
+        }
 
-        OfferArticleVersion offerArticleVersion = OfferArticleVersion.builder()
-                .offerArticle(offerArticle)
-                .articleArchiveId(request.getArticleArchiveId())
-                .documentsArchiveId(request.getDocumentsArchiveId())
-                .comment(request.getComment())
-                .ownerId(offerArticle.getOwnerId())
-                .build();
-        return convertToResponse(versionRepository.save(offerArticleVersion));
+        OfferArticleVersion lastVersion = versionRepository.findLastVersionByOfferArticleId(offerArticleId);
+        if (lastVersion.isDraft()) {
+            throw DRAFT_ALREADY_EXISTS.getException();
+        }
+        OfferArticleVersion newVersion = buildNewVersion(lastVersion, request);
+        return convertToResponse(versionRepository.save(newVersion));
     }
 
     public void submitLastVersion(Long offerArticleId) {
         OfferArticle offerArticle = offerArticleRepository.findById(offerArticleId)
                 .orElseThrow(ARTICLE_NOT_FOUND.getException());
-        validateAccess(offerArticle);
+        validateAccess(offerArticle, headersDto.getUserId());
         offerArticleService.validateEditAccess(offerArticle);
 
-        OfferArticleVersion version = versionRepository.findLastVersionByOfferArticleId(offerArticleId).get();
-        checkVersionIsComplete(version);
+        OfferArticleVersion version = versionRepository.findLastVersionByOfferArticleId(offerArticleId);
+        if (!version.isDraft()) {
+            return;
+        }
+        validCompleteVersion(version);
+
         version.setDraft(false);
         updateStatusToConsideration(offerArticle);
         versionRepository.save(version);
@@ -64,34 +77,37 @@ public class OfferArticleVersionService {
     public OfferArticleVersionResponse getVersion(Long versionId) {
         OfferArticleVersion version = versionRepository.findById(versionId)
                 .orElseThrow(VERSION_NOT_FOUND.getException());
-        validateAccess(version);
+        validateAccess(version, headersDto.getUserId());
         return convertToResponse(version);
     }
 
     public PageDto<OfferArticleVersionResponse> getAllVersions(Long offerArticleId, PageParam pageParam) {
-        final Long userId = AuthService.getUserId();
         return new PageDto<>(
-                versionRepository.findByOfferArticleIdAndOwnerId(offerArticleId, userId, pageParam.toPageable())
+                versionRepository
+                        .findByOfferArticleIdAndOwnerId(offerArticleId, headersDto.getUserId(), pageParam.toPageable())
                         .map(this::convertToResponse)
         );
     }
 
     public OfferArticleVersionResponse editLastVersion(Long offerArticleId, EditOfferArticleVersionRequest request) {
-        OfferArticleVersion version = versionRepository.findLastVersionByOfferArticleId(offerArticleId)
-                .orElseThrow(VERSION_NOT_FOUND.getException());
-        validateAccess(version);
+        OfferArticleVersion version = versionRepository.findLastVersionByOfferArticleId(offerArticleId);
+        validateAccess(version, headersDto.getUserId());
         validateEditAccess(version);
+
+        if (request.getArticleArchiveId() != null) {
+            fileService.validateAccess(request.getArticleArchiveId());
+        }
+        if (request.getDocumentsArchiveId() != null) {
+            fileService.validateAccess(request.getDocumentsArchiveId());
+        }
 
         mapRequestToVersion(request, version);
         return convertToResponse(versionRepository.save(version));
     }
 
     public void deleteLastVersion(Long offerArticleId) {
-        OfferArticleVersion version =
-                versionRepository.findLastVersionByOfferArticleId(offerArticleId).orElse(null);
-        if (version == null)
-            return;
-        validateAccess(version);
+        OfferArticleVersion version = versionRepository.findLastVersionByOfferArticleId(offerArticleId);
+        validateAccess(version, headersDto.getUserId());
         validateEditAccess(version);
         if (versionRepository.countByOfferArticleId(offerArticleId) == 1) {
             throw SINGLE_VERSION_DELETE.getException();
@@ -115,23 +131,29 @@ public class OfferArticleVersionService {
                 .build();
     }
 
-    private void checkVersionIsComplete(OfferArticleVersion version) {
+    private void validCompleteVersion(OfferArticleVersion version) {
         if (version.getArticleArchive() == null || version.getDocumentsArchive() == null) {
             throw VERSION_NOT_COMPLETE.getException();
         }
+        OfferArticleVersion previousVersion =
+                versionRepository.findLastSubmittedVersion(version.getOfferArticle().getId()).orElse(null);
+        if (previousVersion == null) {
+            return;
+        }
+        if (version.getArticleArchiveId().equals(previousVersion.getArticleArchiveId()) &&
+                version.getDocumentsArchiveId().equals(previousVersion.getDocumentsArchiveId()) &&
+                (StringUtils.isBlank(version.getComment()) ||
+                        StringUtils.equals(version.getComment(), previousVersion.getComment()))
+        ) {
+            throw VERSION_NOT_DIFFERENT.getException();
+        }
+
     }
 
     private void mapRequestToVersion(EditOfferArticleVersionRequest request, OfferArticleVersion version) {
-        version.setArticleArchiveId(request.getArticleArchiveId());
-        version.setDocumentsArchiveId(request.getDocumentsArchiveId());
+        version.setArticleArchiveId(parseUuid(request.getArticleArchiveId()));
+        version.setDocumentsArchiveId(parseUuid(request.getDocumentsArchiveId()));
         version.setComment(request.getComment());
-    }
-
-    private void checkIfDraftVersionAlreadyExists(Long offerArticleId) {
-        versionRepository.findLastVersionByOfferArticleId(offerArticleId).ifPresent(version -> {
-            if (version.isDraft())
-                throw DRAFT_ALREADY_EXISTS.getException();
-        });
     }
 
     private void updateStatusToConsideration(OfferArticle offerArticle) {
@@ -139,5 +161,18 @@ public class OfferArticleVersionService {
             offerArticle.setStatus(OfferArticleStatus.UNDER_CONSIDERATION);
             offerArticleRepository.save(offerArticle);
         }
+    }
+
+    private OfferArticleVersion buildNewVersion(OfferArticleVersion lastVersion,
+                                                CreateOfferArticleVersionRequest request) {
+        OfferArticleVersion newVersion = lastVersion.toBuilder()
+                .id(null).comment(request.getComment()).isDraft(true).build();
+        if (request.getArticleArchiveId() != null) {
+            newVersion.setArticleArchiveId(parseUuid(request.getArticleArchiveId()));
+        }
+        if (request.getDocumentsArchiveId() != null) {
+            newVersion.setDocumentsArchiveId(parseUuid(request.getDocumentsArchiveId()));
+        }
+        return newVersion;
     }
 }

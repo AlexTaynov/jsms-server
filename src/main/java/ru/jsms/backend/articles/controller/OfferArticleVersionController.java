@@ -29,8 +29,10 @@ public class OfferArticleVersionController {
     private final OfferArticleVersionService versionService;
 
     @PostMapping("/{offerArticleId}/versions")
-    public ResponseEntity<OfferArticleVersionResponse> createVersion(@PathVariable Long offerArticleId,
-                                                       @Valid @RequestBody CreateOfferArticleVersionRequest request) {
+    public ResponseEntity<OfferArticleVersionResponse> createVersion(
+            @PathVariable Long offerArticleId,
+            @RequestBody CreateOfferArticleVersionRequest request
+    ) {
         return ResponseEntity.ok(versionService.createVersion(offerArticleId, request));
     }
 

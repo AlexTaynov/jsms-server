@@ -10,7 +10,8 @@ import java.text.MessageFormat;
 @Getter
 @AllArgsConstructor
 public enum CommonExceptionCode {
-    ACCESS_DENIED("access_denied", "Доступ запрещен", HttpStatus.FORBIDDEN)
+    ACCESS_DENIED("access_denied", "Доступ запрещен", HttpStatus.FORBIDDEN),
+    UUID_NOT_VALID("uuid_not_valid", "Невалидный идентификатор", HttpStatus.BAD_REQUEST)
     ;
 
     private final String errorCode;

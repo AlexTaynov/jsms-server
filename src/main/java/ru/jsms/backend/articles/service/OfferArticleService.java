@@ -10,9 +10,9 @@ import ru.jsms.backend.articles.entity.OfferArticleVersion;
 import ru.jsms.backend.articles.enums.OfferArticleStatus;
 import ru.jsms.backend.articles.repository.OfferArticleRepository;
 import ru.jsms.backend.articles.repository.OfferArticleVersionRepository;
+import ru.jsms.backend.common.dto.HeadersDto;
 import ru.jsms.backend.common.dto.PageDto;
 import ru.jsms.backend.common.dto.PageParam;
-import ru.jsms.backend.profile.service.AuthService;
 
 import static ru.jsms.backend.articles.enums.ArticleExceptionCode.ARTICLE_NOT_FOUND;
 import static ru.jsms.backend.articles.enums.ArticleExceptionCode.EDIT_DENIED;
@@ -24,19 +24,18 @@ public class OfferArticleService {
 
     private final OfferArticleRepository offerArticleRepository;
     private final OfferArticleVersionRepository versionRepository;
+    private final HeadersDto headersDto;
 
     public PageDto<OfferArticleResponse> getOfferArticles(PageParam pageParam) {
-        final Long userId = AuthService.getUserId();
-        return new PageDto<>(offerArticleRepository.findByOwnerId(userId, pageParam.toPageable())
+        return new PageDto<>(offerArticleRepository.findByOwnerId(headersDto.getUserId(), pageParam.toPageable())
                 .map(this::convertToResponse));
     }
 
     public OfferArticleResponse createOfferArticle(CreateOfferArticleRequest request) {
-        final Long userId = AuthService.getUserId();
         OfferArticle offerArticle = offerArticleRepository.save(
                 OfferArticle.builder()
                         .name(request.getName())
-                        .ownerId(userId)
+                        .ownerId(headersDto.getUserId())
                         .build()
         );
         createDefaultVersion(offerArticle);
@@ -44,17 +43,19 @@ public class OfferArticleService {
     }
 
     public void deleteOfferArticle(Long id) {
-        offerArticleRepository.findById(id).ifPresent(o -> {
-            validateAccess(o);
-            validateDeleteAccess(o);
-            versionRepository.deleteAll(o.getVersions());
-            offerArticleRepository.delete(o);
-        });
+        OfferArticle offerArticle = offerArticleRepository.findById(id).orElse(null);
+        if (offerArticle == null) {
+            return;
+        }
+        validateAccess(offerArticle, headersDto.getUserId());
+        validateDeleteAccess(offerArticle);
+        versionRepository.deleteAll(offerArticle.getVersions());
+        offerArticleRepository.delete(offerArticle);
     }
 
     public OfferArticleResponse editOfferArticle(Long id, EditOfferArticleRequest request) {
         OfferArticle offerArticle = offerArticleRepository.findById(id).orElseThrow(ARTICLE_NOT_FOUND.getException());
-        validateAccess(offerArticle);
+        validateAccess(offerArticle, headersDto.getUserId());
         validateEditAccess(offerArticle);
 
         offerArticle.setName(request.getName());
@@ -75,11 +76,10 @@ public class OfferArticleService {
     }
 
     private void createDefaultVersion(OfferArticle offerArticle) {
-        final Long userId = AuthService.getUserId();
         versionRepository.save(
                 OfferArticleVersion.builder()
                         .offerArticle(offerArticle)
-                        .ownerId(userId)
+                        .ownerId(headersDto.getUserId())
                         .build()
         );
     }

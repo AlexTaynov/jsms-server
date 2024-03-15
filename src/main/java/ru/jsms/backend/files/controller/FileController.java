@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import ru.jsms.backend.files.dto.FileDto;
 import ru.jsms.backend.files.service.FileService;
 
 import java.util.UUID;
@@ -25,7 +26,7 @@ public class FileController {
     private final FileService fileService;
 
     @PostMapping
-    public ResponseEntity<UUID> saveFile(@RequestParam MultipartFile file) {
+    public ResponseEntity<FileDto> saveFile(@RequestParam MultipartFile file) {
         return ResponseEntity.ok(fileService.save(file));
     }
 

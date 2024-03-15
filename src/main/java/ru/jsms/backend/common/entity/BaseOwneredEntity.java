@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@SuperBuilder
+@SuperBuilder(toBuilder = true)
 @MappedSuperclass
 public abstract class BaseOwneredEntity<ID extends Serializable> {
 
