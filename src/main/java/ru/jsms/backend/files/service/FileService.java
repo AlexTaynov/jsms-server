@@ -13,6 +13,7 @@ import ru.jsms.backend.files.repository.FileMetadataRepository;
 
 import java.util.UUID;
 
+import static ru.jsms.backend.common.utils.UuidUtils.parseUuid;
 import static ru.jsms.backend.files.enums.FileExceptionCode.FILE_NOT_FOUND;
 
 @Service
@@ -47,14 +48,12 @@ public class FileService {
     }
 
     public void validateAccess(String uuidString) {
-        UUID uuid;
+        FileMetadataEntity fileMetadata;
         try {
-            uuid = UUID.fromString(uuidString);
-        } catch (IllegalArgumentException e) {
-            throw FILE_NOT_FOUND.getException();
+            fileMetadata = fileMetadataRepository.findByUuid(parseUuid(uuidString)).get();
+        } catch (Exception e) {
+            throw FILE_NOT_FOUND.getException(e.getMessage());
         }
-        FileMetadataEntity fileMetadata = fileMetadataRepository.findByUuid(uuid)
-                .orElseThrow(FILE_NOT_FOUND.getException());
         if (headersDto.isAdmin())
             return;
         BaseOwneredEntityUtils.validateAccess(fileMetadata, headersDto.getUserId());

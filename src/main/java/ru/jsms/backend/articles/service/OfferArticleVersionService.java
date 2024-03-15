@@ -16,8 +16,6 @@ import ru.jsms.backend.common.dto.PageDto;
 import ru.jsms.backend.common.dto.PageParam;
 import ru.jsms.backend.files.service.FileService;
 
-import java.util.UUID;
-
 import static ru.jsms.backend.articles.enums.ArticleExceptionCode.ARTICLE_NOT_FOUND;
 import static ru.jsms.backend.articles.enums.ArticleExceptionCode.DRAFT_ALREADY_EXISTS;
 import static ru.jsms.backend.articles.enums.ArticleExceptionCode.EDIT_DENIED;
@@ -26,6 +24,7 @@ import static ru.jsms.backend.articles.enums.ArticleExceptionCode.VERSION_NOT_CO
 import static ru.jsms.backend.articles.enums.ArticleExceptionCode.VERSION_NOT_DIFFERENT;
 import static ru.jsms.backend.articles.enums.ArticleExceptionCode.VERSION_NOT_FOUND;
 import static ru.jsms.backend.common.utils.BaseOwneredEntityUtils.validateAccess;
+import static ru.jsms.backend.common.utils.UuidUtils.parseUuid;
 
 @RequiredArgsConstructor
 @Service
@@ -152,8 +151,8 @@ public class OfferArticleVersionService {
     }
 
     private void mapRequestToVersion(EditOfferArticleVersionRequest request, OfferArticleVersion version) {
-        version.setArticleArchiveId(UUID.fromString(request.getArticleArchiveId()));
-        version.setDocumentsArchiveId(UUID.fromString(request.getDocumentsArchiveId()));
+        version.setArticleArchiveId(parseUuid(request.getArticleArchiveId()));
+        version.setDocumentsArchiveId(parseUuid(request.getDocumentsArchiveId()));
         version.setComment(request.getComment());
     }
 
@@ -169,10 +168,10 @@ public class OfferArticleVersionService {
         OfferArticleVersion newVersion = lastVersion.toBuilder()
                 .id(null).comment(request.getComment()).isDraft(true).build();
         if (request.getArticleArchiveId() != null) {
-            newVersion.setArticleArchiveId(UUID.fromString(request.getArticleArchiveId()));
+            newVersion.setArticleArchiveId(parseUuid(request.getArticleArchiveId()));
         }
         if (request.getDocumentsArchiveId() != null) {
-            newVersion.setDocumentsArchiveId(UUID.fromString(request.getDocumentsArchiveId()));
+            newVersion.setDocumentsArchiveId(parseUuid(request.getDocumentsArchiveId()));
         }
         return newVersion;
     }
