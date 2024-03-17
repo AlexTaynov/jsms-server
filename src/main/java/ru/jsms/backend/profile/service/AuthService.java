@@ -7,6 +7,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.jsms.backend.common.dto.Role;
 import ru.jsms.backend.common.service.JwtProvider;
+import ru.jsms.backend.profile.dto.RefreshTokenDto;
 import ru.jsms.backend.profile.dto.request.JwtRequest;
 import ru.jsms.backend.profile.dto.request.RegisterRequest;
 import ru.jsms.backend.profile.dto.response.JwtResponse;
@@ -21,6 +22,7 @@ import static ru.jsms.backend.profile.enums.AuthExceptionCode.ACCOUNT_NOT_FOUND;
 import static ru.jsms.backend.profile.enums.AuthExceptionCode.EMAIL_ALREADY_EXISTS;
 import static ru.jsms.backend.profile.enums.AuthExceptionCode.TOKEN_INVALID;
 import static ru.jsms.backend.profile.enums.AuthExceptionCode.WRONG_PASSWORD;
+import static ru.jsms.backend.profile.enums.Claims.USER_ID;
 
 @Service
 @RequiredArgsConstructor
@@ -51,20 +53,20 @@ public class AuthService {
 
     private JwtResponse buildJwtResponse(User user) {
         final String accessToken = jwtProvider.generateAccessToken(user);
-        RefreshToken refreshToken = jwtProvider.generateRefreshToken(user);
-        refreshTokenRepository.save(refreshToken);
+        RefreshTokenDto refreshToken = jwtProvider.generateRefreshToken(user);
+        refreshTokenRepository.save(mapTokenToEntity(refreshToken));
         return new JwtResponse(accessToken, refreshToken.getToken());
     }
 
     public JwtResponse getAccessToken(@NonNull String refreshToken) {
         if (jwtProvider.validateRefreshToken(refreshToken)) {
             final Claims claims = jwtProvider.getRefreshClaims(refreshToken);
-            final Long userId = Long.valueOf(claims.getSubject());
+            final Long userId = claims.get(USER_ID.getName(), Long.class);
             final RefreshToken saveRefreshToken = refreshTokenRepository.findById(userId)
                     .orElseThrow(TOKEN_INVALID.getException());
-            if (saveRefreshToken.getToken().equals(refreshToken)) {
-                final User user = userService.getById(userId)
-                        .orElseThrow(ACCOUNT_NOT_FOUND.getException());
+
+            if (passwordEncoder.matches(refreshToken, saveRefreshToken.getToken())) {
+                final User user = userService.getById(userId).orElseThrow(ACCOUNT_NOT_FOUND.getException());
                 final String accessToken = jwtProvider.generateAccessToken(user);
                 return new JwtResponse(accessToken, null);
             }
@@ -75,18 +77,25 @@ public class AuthService {
     public JwtResponse refresh(@NonNull String refreshToken) {
         if (jwtProvider.validateRefreshToken(refreshToken)) {
             final Claims claims = jwtProvider.getRefreshClaims(refreshToken);
-            final Long userId = Long.valueOf(claims.getSubject());
-            final RefreshToken saveRefreshToken = refreshTokenRepository.findById(userId)
-                    .orElseThrow(TOKEN_INVALID.getException());
-            if (saveRefreshToken.getToken().equals(refreshToken)) {
-                final User user = userService.getById(userId)
-                        .orElseThrow(ACCOUNT_NOT_FOUND.getException());
+            final Long userId = claims.get(USER_ID.getName(), Long.class);
+            final RefreshToken saveRefreshToken =
+                    refreshTokenRepository.findById(userId).orElseThrow(TOKEN_INVALID.getException());
+
+            if (passwordEncoder.matches(refreshToken, saveRefreshToken.getToken())) {
+                final User user = userService.getById(userId).orElseThrow(ACCOUNT_NOT_FOUND.getException());
                 final String accessToken = jwtProvider.generateAccessToken(user);
-                final RefreshToken newRefreshToken = jwtProvider.generateRefreshToken(user);
-                refreshTokenRepository.save(newRefreshToken);
+                final RefreshTokenDto newRefreshToken = jwtProvider.generateRefreshToken(user);
+                refreshTokenRepository.save(mapTokenToEntity(newRefreshToken));
                 return new JwtResponse(accessToken, newRefreshToken.getToken());
             }
         }
         throw TOKEN_INVALID.getException();
+    }
+
+    private RefreshToken mapTokenToEntity(RefreshTokenDto refreshTokenDto) {
+        return new RefreshToken(
+                refreshTokenDto.getUserId(),
+                passwordEncoder.encode(refreshTokenDto.getToken()),
+                refreshTokenDto.getRefreshExpirationInstant());
     }
 }
