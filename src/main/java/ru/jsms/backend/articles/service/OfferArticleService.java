@@ -84,7 +84,7 @@ public class OfferArticleService {
         );
     }
 
-    private OfferArticleResponse convertToResponse(OfferArticle offerArticle) {
+    public OfferArticleResponse convertToResponse(OfferArticle offerArticle) {
         return OfferArticleResponse.builder()
                 .id(offerArticle.getId())
                 .name(offerArticle.getName())

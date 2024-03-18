@@ -21,7 +21,10 @@ public enum ArticleExceptionCode {
     VERSION_NOT_DIFFERENT("version_not_different", "Версия заявки не отличается от предыдущей",
             HttpStatus.BAD_REQUEST),
     DRAFT_ALREADY_EXISTS("draft_already_exists", "У заявки может быть только один черновик",
-            HttpStatus.BAD_REQUEST)
+            HttpStatus.BAD_REQUEST),
+    AUTHOR_NOT_FOUND("author_not_found", "Автор не найден", HttpStatus.NOT_FOUND),
+    AUTHOR_DELETE_DENIED("author_delete_denied", "Нельзя удалить автора, у которого есть статьи",
+            HttpStatus.FORBIDDEN)
     ;
 
     private final String errorCode;
