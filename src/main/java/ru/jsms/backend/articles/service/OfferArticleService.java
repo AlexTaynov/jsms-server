@@ -17,7 +17,9 @@ import ru.jsms.backend.articles.repository.OfferArticleVersionRepository;
 import ru.jsms.backend.common.dto.HeadersDto;
 import ru.jsms.backend.common.dto.PageDto;
 import ru.jsms.backend.common.dto.PageParam;
+import ru.jsms.backend.profile.entity.UserData;
 
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static ru.jsms.backend.articles.enums.ArticleExceptionCode.ARTICLE_NOT_FOUND;
@@ -48,6 +50,7 @@ public class OfferArticleService {
                 OfferArticle.builder()
                         .name(request.getName())
                         .ownerId(headersDto.getUserId())
+                        .authors(Set.of(getAuthorForCurrentUser()))
                         .build()
         );
         createDefaultVersion(offerArticle);
@@ -139,5 +142,16 @@ public class OfferArticleService {
                         .ownerId(headersDto.getUserId())
                         .build()
         );
+    }
+
+    private Author getAuthorForCurrentUser() {
+        UserData userData = headersDto.getUser().getUserData();
+        return authorRepository.findByEmail(userData.getEmail()).orElse(
+                Author.builder()
+                        .firstName(userData.getFirstName())
+                        .secondName(userData.getSecondName())
+                        .email(userData.getEmail())
+                        .ownerId(userData.getUserId())
+                        .build());
     }
 }

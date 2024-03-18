@@ -24,7 +24,9 @@ public enum ArticleExceptionCode {
             HttpStatus.BAD_REQUEST),
     AUTHOR_NOT_FOUND("author_not_found", "Автор не найден", HttpStatus.NOT_FOUND),
     AUTHOR_DELETE_DENIED("author_delete_denied", "Нельзя удалить автора, у которого есть статьи",
-            HttpStatus.FORBIDDEN)
+            HttpStatus.FORBIDDEN),
+    AUTHOR_ALREADY_EXISTS("author_already_exists", "Автор с таким email уже существует",
+            HttpStatus.BAD_REQUEST)
     ;
 
     private final String errorCode;

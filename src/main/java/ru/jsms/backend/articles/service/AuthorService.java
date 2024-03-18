@@ -14,6 +14,7 @@ import ru.jsms.backend.common.dto.PageParam;
 
 import java.util.stream.Collectors;
 
+import static ru.jsms.backend.articles.enums.ArticleExceptionCode.AUTHOR_ALREADY_EXISTS;
 import static ru.jsms.backend.articles.enums.ArticleExceptionCode.AUTHOR_DELETE_DENIED;
 import static ru.jsms.backend.articles.enums.ArticleExceptionCode.AUTHOR_NOT_FOUND;
 import static ru.jsms.backend.common.utils.BaseOwneredEntityUtils.validateAccess;
@@ -35,6 +36,9 @@ public class AuthorService {
     }
 
     public AuthorResponse createAuthor(CreateAuthorRequest request) {
+        if (authorRepository.findByEmail(request.getEmail()).isPresent()) {
+            throw AUTHOR_ALREADY_EXISTS.getException();
+        }
         Author author = Author.builder()
                 .firstName(request.getFirstName())
                 .secondName(request.getSecondName())

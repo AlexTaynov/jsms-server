@@ -8,7 +8,7 @@ CREATE TABLE author
     first_name  VARCHAR(255) NOT NULL,
     second_name VARCHAR(255) NOT NULL,
     patronymic  VARCHAR(255),
-    email       VARCHAR(255) NOT NULL
+    email       VARCHAR(255) UNIQUE NOT NULL
 );
 
 CREATE TABLE article_authors
