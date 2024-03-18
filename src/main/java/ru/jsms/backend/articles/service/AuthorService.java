@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import ru.jsms.backend.articles.dto.request.CreateAuthorRequest;
 import ru.jsms.backend.articles.dto.response.AuthorFullResponse;
 import ru.jsms.backend.articles.dto.response.AuthorResponse;
+import ru.jsms.backend.articles.dto.response.OfferArticleResponse;
 import ru.jsms.backend.articles.entity.Author;
 import ru.jsms.backend.articles.repository.AuthorRepository;
 import ru.jsms.backend.common.dto.HeadersDto;
@@ -22,7 +23,6 @@ import static ru.jsms.backend.common.utils.BaseOwneredEntityUtils.validateAccess
 public class AuthorService {
 
     private final AuthorRepository authorRepository;
-    private final OfferArticleService offerArticleService;
     private final HeadersDto headersDto;
 
     public PageDto<AuthorResponse> getAuthors(PageParam pageParam) {
@@ -57,7 +57,7 @@ public class AuthorService {
         authorRepository.deleteById(authorId);
     }
 
-    public AuthorResponse convertToResponse(Author author) {
+    private AuthorResponse convertToResponse(Author author) {
         return AuthorResponse.builder()
                 .id(author.getId())
                 .email(author.getEmail())
@@ -74,7 +74,12 @@ public class AuthorService {
                 .firstName(author.getFirstName())
                 .secondName(author.getSecondName())
                 .patronymic(author.getPatronymic())
-                .articles(author.getArticles().stream().map(offerArticleService::convertToResponse)
+                .articles(author.getArticles().stream()
+                        .map(offerArticle -> OfferArticleResponse.builder()
+                                .id(offerArticle.getId())
+                                .name(offerArticle.getName())
+                                .status(offerArticle.getStatus().toString())
+                                .build())
                         .collect(Collectors.toList()))
                 .build();
     }
