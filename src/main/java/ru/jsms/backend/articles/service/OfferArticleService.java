@@ -17,9 +17,8 @@ import ru.jsms.backend.articles.repository.OfferArticleVersionRepository;
 import ru.jsms.backend.common.dto.HeadersDto;
 import ru.jsms.backend.common.dto.PageDto;
 import ru.jsms.backend.common.dto.PageParam;
-import ru.jsms.backend.profile.entity.UserData;
 
-import java.util.Set;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static ru.jsms.backend.articles.enums.ArticleExceptionCode.ARTICLE_NOT_FOUND;
@@ -46,11 +45,12 @@ public class OfferArticleService {
     }
 
     public OfferArticleResponse createOfferArticle(CreateOfferArticleRequest request) {
+        List<Author> authors = findAll(request.getAuthors());
         OfferArticle offerArticle = offerArticleRepository.save(
                 OfferArticle.builder()
                         .name(request.getName())
                         .ownerId(headersDto.getUserId())
-                        .authors(Set.of(getAuthorForCurrentUser()))
+                        .authors(authors)
                         .build()
         );
         createDefaultVersion(offerArticle);
@@ -73,28 +73,12 @@ public class OfferArticleService {
         validateAccess(offerArticle, headersDto.getUserId());
         validateEditAccess(offerArticle);
 
-        offerArticle.setName(request.getName());
+        offerArticle.setAuthors(findAll(request.getAuthors()));
+        if (request.getName() != null) {
+            offerArticle.setName(request.getName());
+        }
+        offerArticleRepository.save(offerArticle);
         return convertToResponse(offerArticleRepository.save(offerArticle));
-    }
-
-    public void addAuthor(Long offerArticleId, Long authorId) {
-        OfferArticle offerArticle = offerArticleRepository.findById(offerArticleId).orElseThrow(ARTICLE_NOT_FOUND.getException());
-        validateAccess(offerArticle, headersDto.getUserId());
-        validateEditAccess(offerArticle);
-
-        Author author = authorRepository.findById(authorId).orElseThrow(AUTHOR_NOT_FOUND.getException());
-        offerArticle.getAuthors().add(author);
-        offerArticleRepository.save(offerArticle);
-    }
-
-    public void deleteAuthor(Long offerArticleId, Long authorId) {
-        OfferArticle offerArticle = offerArticleRepository.findById(offerArticleId).orElseThrow(ARTICLE_NOT_FOUND.getException());
-        validateAccess(offerArticle, headersDto.getUserId());
-        validateEditAccess(offerArticle);
-
-        Author author = authorRepository.findById(authorId).orElseThrow(AUTHOR_NOT_FOUND.getException());
-        offerArticle.getAuthors().remove(author);
-        offerArticleRepository.save(offerArticle);
     }
 
     public void validateEditAccess(OfferArticle offerArticle) {
@@ -105,11 +89,7 @@ public class OfferArticleService {
     }
 
     private OfferArticleResponse convertToResponse(OfferArticle offerArticle) {
-        return OfferArticleResponse.builder()
-                .id(offerArticle.getId())
-                .name(offerArticle.getName())
-                .status(offerArticle.getStatus().toString())
-                .build();
+        return new OfferArticleResponse(offerArticle);
     }
 
     private OfferArticleFullResponse convertToFullResponse(OfferArticle offerArticle) {
@@ -117,15 +97,7 @@ public class OfferArticleService {
                 .id(offerArticle.getId())
                 .name(offerArticle.getName())
                 .status(offerArticle.getStatus().toString())
-                .authors(offerArticle.getAuthors().stream()
-                        .map(author -> AuthorResponse.builder()
-                                .id(author.getId())
-                                .email(author.getEmail())
-                                .firstName(author.getFirstName())
-                                .secondName(author.getSecondName())
-                                .patronymic(author.getPatronymic())
-                                .build())
-                        .collect(Collectors.toList()))
+                .authors(offerArticle.getAuthors().stream().map(AuthorResponse::new).collect(Collectors.toList()))
                 .build();
     }
 
@@ -144,14 +116,14 @@ public class OfferArticleService {
         );
     }
 
-    private Author getAuthorForCurrentUser() {
-        UserData userData = headersDto.getUser().getUserData();
-        return authorRepository.findByEmail(userData.getEmail()).orElse(
-                Author.builder()
-                        .firstName(userData.getFirstName())
-                        .secondName(userData.getSecondName())
-                        .email(userData.getEmail())
-                        .ownerId(userData.getUserId())
-                        .build());
+    private List<Author> findAll(List<Long> authorIds) {
+        List<Author> authors = List.of();
+        if (authorIds != null) {
+            authors = authorRepository.findAll(authorIds);
+            if (authors.size() != authorIds.size()) {
+                throw AUTHOR_NOT_FOUND.getException();
+            }
+        }
+        return authors;
     }
 }

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.jsms.backend.articles.dto.request.CreateAuthorRequest;
 import ru.jsms.backend.articles.dto.response.AuthorFullResponse;
@@ -22,14 +23,16 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping("/api/authors")
 @RequiredArgsConstructor
-@PreAuthorize("hasAuthority('USER')")
 public class AuthorController {
 
     private final AuthorService authorService;
 
     @GetMapping
-    public ResponseEntity<PageDto<AuthorResponse>> getAuthors(PageParam pageParam) {
-        return ResponseEntity.ok(authorService.getAuthors(pageParam));
+    public ResponseEntity<PageDto<AuthorResponse>> getAuthorsByFullname(
+            PageParam pageParam,
+            @RequestParam(name = "fullname", defaultValue = "") String fullnameSubstring
+    ) {
+        return ResponseEntity.ok(authorService.getAuthorsByFullname(pageParam, fullnameSubstring));
     }
 
     @GetMapping("/{authorId}")
@@ -43,6 +46,7 @@ public class AuthorController {
     }
 
     @DeleteMapping("/{authorId}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Void> deleteAuthor(@PathVariable Long authorId) {
         authorService.deleteAuthor(authorId);
         return ResponseEntity.ok().build();

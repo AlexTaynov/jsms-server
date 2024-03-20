@@ -11,7 +11,7 @@ import java.text.MessageFormat;
 @AllArgsConstructor
 public enum ArticleExceptionCode {
     ACCESS_DENIED("access_denied", "Доступ запрещен", HttpStatus.FORBIDDEN),
-    EDIT_DENIED("edit_denied", "Заявка уже отправлена", HttpStatus.FORBIDDEN),
+    EDIT_DENIED("delete_denied", "Заявка уже отправлена", HttpStatus.FORBIDDEN),
     ARTICLE_NOT_FOUND("article_not_found", "Заявка не найдена", HttpStatus.NOT_FOUND),
     VERSION_NOT_FOUND("version_not_found", "Версия заявки не найдена", HttpStatus.NOT_FOUND),
     SINGLE_VERSION_DELETE("single_version_delete", "Нельзя удалить единственную версию заявки",
@@ -26,7 +26,9 @@ public enum ArticleExceptionCode {
     AUTHOR_DELETE_DENIED("author_delete_denied", "Нельзя удалить автора, у которого есть статьи",
             HttpStatus.FORBIDDEN),
     AUTHOR_ALREADY_EXISTS("author_already_exists", "Автор с таким email уже существует",
-            HttpStatus.BAD_REQUEST)
+            HttpStatus.BAD_REQUEST),
+    OFFER_NOT_COMPLETE("offer_not_complete", "У статьи должно быть название и хотя бы один автор",
+                         HttpStatus.BAD_REQUEST)
     ;
 
     private final String errorCode;

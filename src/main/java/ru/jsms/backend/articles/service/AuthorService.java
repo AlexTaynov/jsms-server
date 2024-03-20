@@ -8,7 +8,6 @@ import ru.jsms.backend.articles.dto.response.AuthorResponse;
 import ru.jsms.backend.articles.dto.response.OfferArticleResponse;
 import ru.jsms.backend.articles.entity.Author;
 import ru.jsms.backend.articles.repository.AuthorRepository;
-import ru.jsms.backend.common.dto.HeadersDto;
 import ru.jsms.backend.common.dto.PageDto;
 import ru.jsms.backend.common.dto.PageParam;
 
@@ -17,17 +16,15 @@ import java.util.stream.Collectors;
 import static ru.jsms.backend.articles.enums.ArticleExceptionCode.AUTHOR_ALREADY_EXISTS;
 import static ru.jsms.backend.articles.enums.ArticleExceptionCode.AUTHOR_DELETE_DENIED;
 import static ru.jsms.backend.articles.enums.ArticleExceptionCode.AUTHOR_NOT_FOUND;
-import static ru.jsms.backend.common.utils.BaseOwneredEntityUtils.validateAccess;
 
 @RequiredArgsConstructor
 @Service
 public class AuthorService {
 
     private final AuthorRepository authorRepository;
-    private final HeadersDto headersDto;
 
-    public PageDto<AuthorResponse> getAuthors(PageParam pageParam) {
-        return new PageDto<>(authorRepository.findAll(pageParam.toPageable())
+    public PageDto<AuthorResponse> getAuthorsByFullname(PageParam pageParam, String fullnameSubstring) {
+        return new PageDto<>(authorRepository.findByFullnameLike(fullnameSubstring, pageParam.toPageable())
                 .map(this::convertToResponse));
     }
 
@@ -44,7 +41,6 @@ public class AuthorService {
                 .secondName(request.getSecondName())
                 .patronymic(request.getPatronymic())
                 .email(request.getEmail())
-                .ownerId(headersDto.getUserId())
                 .build();
         return convertToResponse(authorRepository.save(author));
     }
@@ -54,7 +50,6 @@ public class AuthorService {
         if (author == null) {
             return;
         }
-        validateAccess(author, headersDto.getUserId());
         if (!author.getArticles().isEmpty()) {
             throw AUTHOR_DELETE_DENIED.getException();
         }
@@ -62,13 +57,7 @@ public class AuthorService {
     }
 
     private AuthorResponse convertToResponse(Author author) {
-        return AuthorResponse.builder()
-                .id(author.getId())
-                .email(author.getEmail())
-                .firstName(author.getFirstName())
-                .secondName(author.getSecondName())
-                .patronymic(author.getPatronymic())
-                .build();
+        return new AuthorResponse(author);
     }
 
     private AuthorFullResponse convertToFullResponse(Author author) {
@@ -78,13 +67,7 @@ public class AuthorService {
                 .firstName(author.getFirstName())
                 .secondName(author.getSecondName())
                 .patronymic(author.getPatronymic())
-                .articles(author.getArticles().stream()
-                        .map(offerArticle -> OfferArticleResponse.builder()
-                                .id(offerArticle.getId())
-                                .name(offerArticle.getName())
-                                .status(offerArticle.getStatus().toString())
-                                .build())
-                        .collect(Collectors.toList()))
+                .articles(author.getArticles().stream().map(OfferArticleResponse::new).collect(Collectors.toList()))
                 .build();
     }
 }

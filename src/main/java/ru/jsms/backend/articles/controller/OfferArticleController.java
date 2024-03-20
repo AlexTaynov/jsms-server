@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.jsms.backend.articles.dto.request.CreateOfferArticleRequest;
 import ru.jsms.backend.articles.dto.request.EditOfferArticleRequest;
@@ -56,19 +55,5 @@ public class OfferArticleController {
     public ResponseEntity<OfferArticleResponse> editOfferArticle(@PathVariable Long id,
                                                  @Valid @RequestBody EditOfferArticleRequest request) {
         return ResponseEntity.ok(offerArticleService.editOfferArticle(id, request));
-    }
-
-    @PostMapping("/{offerArticleId}/authors")
-    public ResponseEntity<Void> addAuthor(@PathVariable Long offerArticleId,
-                                          @RequestParam Long authorId) {
-        offerArticleService.addAuthor(offerArticleId, authorId);
-        return ResponseEntity.ok().build();
-    }
-
-    @DeleteMapping("/{offerArticleId}/authors")
-    public ResponseEntity<Void> deleteAuthor(@PathVariable Long offerArticleId,
-                                          @RequestParam Long authorId) {
-        offerArticleService.deleteAuthor(offerArticleId, authorId);
-        return ResponseEntity.ok().build();
     }
 }
