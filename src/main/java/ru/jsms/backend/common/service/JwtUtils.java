@@ -10,13 +10,15 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static ru.jsms.backend.profile.enums.Claims.USER_ID;
+
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class JwtUtils {
 
     public static JwtAuthentication generate(Claims claims) {
         final JwtAuthentication jwtInfoToken = new JwtAuthentication();
         jwtInfoToken.setRoles(getRoles(claims));
-        jwtInfoToken.setUserId(Long.parseLong(claims.getSubject()));
+        jwtInfoToken.setUserId(claims.get(USER_ID.getName(), Long.class));
         return jwtInfoToken;
     }
 

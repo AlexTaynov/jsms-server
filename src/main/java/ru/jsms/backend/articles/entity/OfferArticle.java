@@ -13,9 +13,14 @@ import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.util.Set;
+
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @Getter
 @Setter
@@ -34,4 +39,16 @@ public class OfferArticle extends BaseOwneredEntity<Long> {
 
     @OneToMany(mappedBy = "offerArticle", cascade = CascadeType.ALL)
     private Set<OfferArticleVersion> versions;
+
+    @ManyToMany
+    @JoinTable(
+            name = "article_authors",
+            joinColumns = { @JoinColumn(name = "article_id") },
+            inverseJoinColumns = { @JoinColumn(name = "author_id") }
+    )
+    private Set<Author> authors;
+
+    public boolean isComplete() {
+        return !isBlank(name) && !authors.isEmpty();
+    }
 }

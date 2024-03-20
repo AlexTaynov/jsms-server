@@ -13,10 +13,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.jsms.backend.articles.dto.request.CreateOfferArticleRequest;
 import ru.jsms.backend.articles.dto.request.EditOfferArticleRequest;
-import ru.jsms.backend.common.dto.PageParam;
+import ru.jsms.backend.articles.dto.response.OfferArticleFullResponse;
 import ru.jsms.backend.articles.dto.response.OfferArticleResponse;
-import ru.jsms.backend.common.dto.PageDto;
 import ru.jsms.backend.articles.service.OfferArticleService;
+import ru.jsms.backend.common.dto.PageDto;
+import ru.jsms.backend.common.dto.PageParam;
 
 import javax.validation.Valid;
 
@@ -31,6 +32,11 @@ public class OfferArticleController {
     @GetMapping
     public ResponseEntity<PageDto<OfferArticleResponse>> getOfferArticles(PageParam pageParam) {
         return ResponseEntity.ok(offerArticleService.getOfferArticles(pageParam));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<OfferArticleFullResponse> getOfferArticle(@PathVariable Long id) {
+        return ResponseEntity.ok(offerArticleService.getOfferArticle(id));
     }
 
     @PostMapping
