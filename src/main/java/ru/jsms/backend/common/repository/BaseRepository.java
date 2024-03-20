@@ -13,6 +13,7 @@ import ru.jsms.backend.common.entity.BaseEntity;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @NoRepositoryBean
 public interface BaseRepository<T extends BaseEntity<ID>, ID extends Serializable>
@@ -30,7 +31,7 @@ public interface BaseRepository<T extends BaseEntity<ID>, ID extends Serializabl
 
     @Transactional(readOnly = true)
     @Query("select e from #{#entityName} e where e.id in ?1 and e.deleted = false")
-    List<T> findAll(List<ID> authors);
+    Set<T> findAll(Set<ID> ids);
 
     @Override
     @Transactional(readOnly = true)

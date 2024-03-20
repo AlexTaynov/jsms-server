@@ -18,7 +18,7 @@ import ru.jsms.backend.common.dto.HeadersDto;
 import ru.jsms.backend.common.dto.PageDto;
 import ru.jsms.backend.common.dto.PageParam;
 
-import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static ru.jsms.backend.articles.enums.ArticleExceptionCode.ARTICLE_NOT_FOUND;
@@ -45,7 +45,7 @@ public class OfferArticleService {
     }
 
     public OfferArticleResponse createOfferArticle(CreateOfferArticleRequest request) {
-        List<Author> authors = findAll(request.getAuthors());
+        Set<Author> authors = findAll(request.getAuthorIds());
         OfferArticle offerArticle = offerArticleRepository.save(
                 OfferArticle.builder()
                         .name(request.getName())
@@ -73,7 +73,7 @@ public class OfferArticleService {
         validateAccess(offerArticle, headersDto.getUserId());
         validateEditAccess(offerArticle);
 
-        offerArticle.setAuthors(findAll(request.getAuthors()));
+        offerArticle.setAuthors(findAll(request.getAuthorIds()));
         if (request.getName() != null) {
             offerArticle.setName(request.getName());
         }
@@ -116,8 +116,8 @@ public class OfferArticleService {
         );
     }
 
-    private List<Author> findAll(List<Long> authorIds) {
-        List<Author> authors = List.of();
+    private Set<Author> findAll(Set<Long> authorIds) {
+        Set<Author> authors = Set.of();
         if (authorIds != null) {
             authors = authorRepository.findAll(authorIds);
             if (authors.size() != authorIds.size()) {

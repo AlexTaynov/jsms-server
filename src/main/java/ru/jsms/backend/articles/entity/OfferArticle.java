@@ -18,10 +18,9 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import java.util.List;
 import java.util.Set;
 
-import static liquibase.repackaged.org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @Getter
 @Setter
@@ -47,7 +46,7 @@ public class OfferArticle extends BaseOwneredEntity<Long> {
             joinColumns = { @JoinColumn(name = "article_id") },
             inverseJoinColumns = { @JoinColumn(name = "author_id") }
     )
-    private List<Author> authors;
+    private Set<Author> authors;
 
     public boolean isComplete() {
         return !isBlank(name) && !authors.isEmpty();

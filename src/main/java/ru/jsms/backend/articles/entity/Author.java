@@ -12,7 +12,7 @@ import javax.persistence.ManyToMany;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -35,5 +35,5 @@ public class Author extends BaseEntity<Long> {
     private String email;
 
     @ManyToMany(mappedBy = "authors")
-    private List<OfferArticle> articles;
+    private Set<OfferArticle> articles;
 }
