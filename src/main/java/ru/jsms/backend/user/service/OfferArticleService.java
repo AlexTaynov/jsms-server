@@ -2,6 +2,7 @@ package ru.jsms.backend.user.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.jsms.backend.admin.service.ArticleService;
 import ru.jsms.backend.user.dto.request.CreateOfferArticleRequest;
 import ru.jsms.backend.user.dto.request.EditOfferArticleRequest;
 import ru.jsms.backend.user.dto.response.AuthorResponse;
@@ -30,6 +31,7 @@ import static ru.jsms.backend.common.utils.BaseOwneredEntityUtils.validateAccess
 @Service
 public class OfferArticleService {
 
+    private final ArticleService articleService;
     private final OfferArticleRepository offerArticleRepository;
     private final OfferArticleVersionRepository versionRepository;
     private final AuthorRepository authorRepository;
@@ -125,5 +127,13 @@ public class OfferArticleService {
             }
         }
         return authors;
+    }
+
+    public void submit(OfferArticle offerArticle) {
+        if (offerArticle.getStatus() == OfferArticleStatus.DRAFT) {
+            offerArticle.setStatus(OfferArticleStatus.UNDER_CONSIDERATION);
+            offerArticleRepository.save(offerArticle);
+            articleService.createArticle(offerArticle);
+        }
     }
 }

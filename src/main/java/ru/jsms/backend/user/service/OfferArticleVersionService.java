@@ -3,18 +3,19 @@ package ru.jsms.backend.user.service;
 import liquibase.repackaged.org.apache.commons.lang3.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.jsms.backend.user.dto.request.EditOfferArticleVersionRequest;
-import ru.jsms.backend.user.dto.response.OfferArticleVersionResponse;
-import ru.jsms.backend.user.entity.OfferArticle;
-import ru.jsms.backend.user.entity.OfferArticleVersion;
-import ru.jsms.backend.user.enums.OfferArticleStatus;
-import ru.jsms.backend.user.repository.OfferArticleRepository;
-import ru.jsms.backend.user.repository.OfferArticleVersionRepository;
 import ru.jsms.backend.common.dto.HeadersDto;
 import ru.jsms.backend.common.dto.PageDto;
 import ru.jsms.backend.common.dto.PageParam;
 import ru.jsms.backend.files.service.FileService;
+import ru.jsms.backend.user.dto.request.EditOfferArticleVersionRequest;
+import ru.jsms.backend.user.dto.response.OfferArticleVersionResponse;
+import ru.jsms.backend.user.entity.OfferArticle;
+import ru.jsms.backend.user.entity.OfferArticleVersion;
+import ru.jsms.backend.user.repository.OfferArticleRepository;
+import ru.jsms.backend.user.repository.OfferArticleVersionRepository;
 
+import static ru.jsms.backend.common.utils.BaseOwneredEntityUtils.validateAccess;
+import static ru.jsms.backend.common.utils.UuidUtils.parseUuid;
 import static ru.jsms.backend.user.enums.ArticleExceptionCode.ARTICLE_NOT_FOUND;
 import static ru.jsms.backend.user.enums.ArticleExceptionCode.EDIT_DENIED;
 import static ru.jsms.backend.user.enums.ArticleExceptionCode.OFFER_NOT_COMPLETE;
@@ -22,8 +23,6 @@ import static ru.jsms.backend.user.enums.ArticleExceptionCode.SINGLE_VERSION_DEL
 import static ru.jsms.backend.user.enums.ArticleExceptionCode.VERSION_NOT_COMPLETE;
 import static ru.jsms.backend.user.enums.ArticleExceptionCode.VERSION_NOT_DIFFERENT;
 import static ru.jsms.backend.user.enums.ArticleExceptionCode.VERSION_NOT_FOUND;
-import static ru.jsms.backend.common.utils.BaseOwneredEntityUtils.validateAccess;
-import static ru.jsms.backend.common.utils.UuidUtils.parseUuid;
 
 @RequiredArgsConstructor
 @Service
@@ -51,7 +50,7 @@ public class OfferArticleVersionService {
         validCompleteVersion(version);
 
         version.setDraft(false);
-        updateStatusToConsideration(offerArticle);
+        offerArticleService.submit(offerArticle);
         versionRepository.save(version);
     }
 
@@ -137,12 +136,5 @@ public class OfferArticleVersionService {
         version.setArticleArchiveId(parseUuid(request.getArticleArchiveId()));
         version.setDocumentsArchiveId(parseUuid(request.getDocumentsArchiveId()));
         version.setComment(request.getComment());
-    }
-
-    private void updateStatusToConsideration(OfferArticle offerArticle) {
-        if (offerArticle.getStatus() == OfferArticleStatus.DRAFT) {
-            offerArticle.setStatus(OfferArticleStatus.UNDER_CONSIDERATION);
-            offerArticleRepository.save(offerArticle);
-        }
     }
 }
