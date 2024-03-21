@@ -3,6 +3,7 @@ package ru.jsms.backend.user.service;
 import liquibase.repackaged.org.apache.commons.lang3.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.jsms.backend.admin.dto.response.OfferArticleAnswerResponse;
 import ru.jsms.backend.common.dto.HeadersDto;
 import ru.jsms.backend.common.dto.PageDto;
 import ru.jsms.backend.common.dto.PageParam;
@@ -110,6 +111,7 @@ public class OfferArticleVersionService {
                 .documentsArchiveId(version.getDocumentsArchiveId())
                 .comment(version.getComment())
                 .isDraft(version.isDraft())
+                .answer(version.getAnswer() == null ? null : new OfferArticleAnswerResponse(version.getAnswer()))
                 .build();
     }
 

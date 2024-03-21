@@ -40,12 +40,6 @@ public class OfferArticleAnswerService {
     }
 
     private OfferArticleAnswerResponse convertToResponse(OfferArticleAnswer answer) {
-        return OfferArticleAnswerResponse.builder()
-                .id(answer.getId())
-                .versionId(answer.getVersionId())
-                .documentId(answer.getDocumentId())
-                .comment(answer.getComment())
-                .isDraft(answer.isDraft())
-                .build();
+        return new OfferArticleAnswerResponse(answer);
     }
 }

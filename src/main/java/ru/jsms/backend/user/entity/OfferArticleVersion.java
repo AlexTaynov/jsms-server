@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import ru.jsms.backend.admin.entity.OfferArticleAnswer;
 import ru.jsms.backend.common.entity.BaseOwneredEntity;
 import ru.jsms.backend.files.entity.FileMetadataEntity;
 
@@ -13,6 +14,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import java.util.UUID;
 
@@ -28,6 +30,9 @@ public class OfferArticleVersion extends BaseOwneredEntity<Long> {
     @ManyToOne
     @JoinColumn(name = "offer_article_id")
     private OfferArticle offerArticle;
+
+    @OneToOne(mappedBy = "offerArticleVersion")
+    private OfferArticleAnswer answer;
 
     @ManyToOne
     @JoinColumn(name = "article_archive_uuid", referencedColumnName = "uuid", insertable = false, updatable = false)
