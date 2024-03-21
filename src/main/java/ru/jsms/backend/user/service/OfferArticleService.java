@@ -79,7 +79,6 @@ public class OfferArticleService {
         if (request.getName() != null) {
             offerArticle.setName(request.getName());
         }
-        offerArticleRepository.save(offerArticle);
         return convertToResponse(offerArticleRepository.save(offerArticle));
     }
 

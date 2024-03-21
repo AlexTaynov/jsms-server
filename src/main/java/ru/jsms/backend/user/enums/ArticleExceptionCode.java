@@ -28,7 +28,8 @@ public enum ArticleExceptionCode {
     AUTHOR_ALREADY_EXISTS("author_already_exists", "Автор с таким email уже существует",
             HttpStatus.BAD_REQUEST),
     OFFER_NOT_COMPLETE("offer_not_complete", "У статьи должно быть название и хотя бы один автор",
-                         HttpStatus.BAD_REQUEST)
+                         HttpStatus.BAD_REQUEST),
+    STATUS_NOT_VALID("status_not_valid", "Такого статуса не существует", HttpStatus.BAD_REQUEST)
     ;
 
     private final String errorCode;
