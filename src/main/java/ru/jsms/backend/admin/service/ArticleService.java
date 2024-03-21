@@ -15,7 +15,7 @@ import ru.jsms.backend.user.entity.OfferArticle;
 
 import java.util.stream.Collectors;
 
-import static ru.jsms.backend.user.enums.ArticleExceptionCode.ARTICLE_NOT_FOUND;
+import static ru.jsms.backend.admin.enums.AdminArticleExceptionCode.ARTICLE_NOT_FOUND;
 import static ru.jsms.backend.user.enums.ArticleExceptionCode.STATUS_NOT_VALID;
 
 @Service

@@ -16,7 +16,7 @@ import ru.jsms.backend.user.repository.OfferArticleVersionRepository;
 
 import static ru.jsms.backend.common.utils.BaseOwneredEntityUtils.validateAccess;
 import static ru.jsms.backend.common.utils.UuidUtils.parseUuid;
-import static ru.jsms.backend.user.enums.ArticleExceptionCode.ARTICLE_NOT_FOUND;
+import static ru.jsms.backend.user.enums.ArticleExceptionCode.OFFER_NOT_FOUND;
 import static ru.jsms.backend.user.enums.ArticleExceptionCode.EDIT_DENIED;
 import static ru.jsms.backend.user.enums.ArticleExceptionCode.OFFER_NOT_COMPLETE;
 import static ru.jsms.backend.user.enums.ArticleExceptionCode.SINGLE_VERSION_DELETE;
@@ -36,7 +36,7 @@ public class OfferArticleVersionService {
 
     public void submitLastVersion(Long offerArticleId) {
         OfferArticle offerArticle = offerArticleRepository.findById(offerArticleId)
-                .orElseThrow(ARTICLE_NOT_FOUND.getException());
+                .orElseThrow(OFFER_NOT_FOUND.getException());
         validateAccess(offerArticle, headersDto.getUserId());
         offerArticleService.validateEditAccess(offerArticle);
         if (!offerArticle.isComplete()) {

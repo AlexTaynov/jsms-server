@@ -26,8 +26,10 @@ import java.util.UUID;
 public class OfferArticleAnswer extends BaseEntity<Long> {
 
     @OneToOne
-    @JoinColumn(name = "version_id")
+    @JoinColumn(name = "version_id", insertable = false, updatable = false)
     private OfferArticleVersion offerArticleVersion;
+    @Column(name = "version_id")
+    private Long versionId;
 
     @ManyToOne
     @JoinColumn(name = "documents_archive_uuid", referencedColumnName = "uuid", insertable = false, updatable = false)

@@ -22,7 +22,7 @@ import ru.jsms.backend.common.dto.PageParam;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static ru.jsms.backend.user.enums.ArticleExceptionCode.ARTICLE_NOT_FOUND;
+import static ru.jsms.backend.user.enums.ArticleExceptionCode.OFFER_NOT_FOUND;
 import static ru.jsms.backend.user.enums.ArticleExceptionCode.AUTHOR_NOT_FOUND;
 import static ru.jsms.backend.user.enums.ArticleExceptionCode.EDIT_DENIED;
 import static ru.jsms.backend.common.utils.BaseOwneredEntityUtils.validateAccess;
@@ -43,7 +43,7 @@ public class OfferArticleService {
     }
 
     public OfferArticleFullResponse getOfferArticle(Long id) {
-        return convertToFullResponse(offerArticleRepository.findById(id).orElseThrow(ARTICLE_NOT_FOUND.getException()));
+        return convertToFullResponse(offerArticleRepository.findById(id).orElseThrow(OFFER_NOT_FOUND.getException()));
     }
 
     public OfferArticleResponse createOfferArticle(CreateOfferArticleRequest request) {
@@ -71,7 +71,7 @@ public class OfferArticleService {
     }
 
     public OfferArticleResponse editOfferArticle(Long id, EditOfferArticleRequest request) {
-        OfferArticle offerArticle = offerArticleRepository.findById(id).orElseThrow(ARTICLE_NOT_FOUND.getException());
+        OfferArticle offerArticle = offerArticleRepository.findById(id).orElseThrow(OFFER_NOT_FOUND.getException());
         validateAccess(offerArticle, headersDto.getUserId());
         validateEditAccess(offerArticle);
 
