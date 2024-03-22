@@ -17,7 +17,7 @@ import ru.jsms.backend.common.dto.PageDto;
 import ru.jsms.backend.common.dto.PageParam;
 
 @RestController
-@RequestMapping("/api/articles")
+@RequestMapping("/api/admin/articles")
 @RequiredArgsConstructor
 @PreAuthorize("hasAuthority('ADMIN')")
 public class ArticleController {
