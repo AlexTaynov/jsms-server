@@ -67,4 +67,8 @@ public class FileService {
             return;
         BaseOwneredEntityUtils.validateAccess(fileMetadata, headersDto.getUserId());
     }
+
+    public void validateAccess(UUID uuid) {
+        validateAccess(uuid.toString());
+    }
 }
