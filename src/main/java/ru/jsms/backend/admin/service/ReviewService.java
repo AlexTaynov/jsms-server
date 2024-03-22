@@ -31,11 +31,6 @@ public class ReviewService {
     }
 
     private ReviewResponse convertToResponse(Review review) {
-        return ReviewResponse.builder()
-                .versionId(review.getVersionId())
-                .antiPlagiarism(review.getAntiPlagiarism())
-                .firstReviewerFileId(review.getFirstReviewerFileId())
-                .secondReviewerFileId(review.getSecondReviewerFileId())
-                .build();
+        return new ReviewResponse(review);
     }
 }

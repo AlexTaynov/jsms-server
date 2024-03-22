@@ -4,6 +4,7 @@ import liquibase.repackaged.org.apache.commons.lang3.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.jsms.backend.admin.dto.response.OfferArticleAnswerResponse;
+import ru.jsms.backend.admin.dto.response.ReviewResponse;
 import ru.jsms.backend.common.dto.HeadersDto;
 import ru.jsms.backend.common.dto.PageDto;
 import ru.jsms.backend.common.dto.PageParam;
@@ -114,6 +115,7 @@ public class OfferArticleVersionService {
                 .comment(version.getComment())
                 .isDraft(version.isDraft())
                 .answer(Optional.ofNullable(version.getAnswer()).map(OfferArticleAnswerResponse::new).orElse(null))
+                .review(Optional.ofNullable(version.getReview()).map(ReviewResponse::new).orElse(null))
                 .build();
     }
 

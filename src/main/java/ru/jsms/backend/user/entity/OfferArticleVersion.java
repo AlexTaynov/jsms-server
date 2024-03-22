@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import ru.jsms.backend.admin.entity.OfferArticleAnswer;
+import ru.jsms.backend.admin.entity.Review;
 import ru.jsms.backend.common.entity.BaseOwneredEntity;
 import ru.jsms.backend.files.entity.FileMetadataEntity;
 
@@ -33,6 +34,9 @@ public class OfferArticleVersion extends BaseOwneredEntity<Long> {
 
     @OneToOne(mappedBy = "offerArticleVersion")
     private OfferArticleAnswer answer;
+
+    @OneToOne(mappedBy = "offerArticleVersion")
+    private Review review;
 
     @ManyToOne
     @JoinColumn(name = "article_archive_uuid", referencedColumnName = "uuid", insertable = false, updatable = false)

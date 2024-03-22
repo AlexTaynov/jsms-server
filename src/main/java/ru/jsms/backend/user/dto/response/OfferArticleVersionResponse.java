@@ -3,6 +3,7 @@ package ru.jsms.backend.user.dto.response;
 import lombok.Builder;
 import lombok.Data;
 import ru.jsms.backend.admin.dto.response.OfferArticleAnswerResponse;
+import ru.jsms.backend.admin.dto.response.ReviewResponse;
 
 import java.util.UUID;
 
@@ -16,4 +17,5 @@ public class OfferArticleVersionResponse {
     @Builder.Default
     private boolean isDraft = true;
     private OfferArticleAnswerResponse answer;
+    private ReviewResponse review;
 }
