@@ -10,26 +10,35 @@ import ru.jsms.backend.common.utils.BaseOwneredEntityUtils;
 import ru.jsms.backend.files.dto.FileDto;
 import ru.jsms.backend.files.entity.FileMetadataEntity;
 import ru.jsms.backend.files.repository.FileMetadataRepository;
+import ru.jsms.backend.profile.service.UserService;
 
 import java.util.UUID;
 
 import static ru.jsms.backend.common.utils.UuidUtils.parseUuid;
 import static ru.jsms.backend.files.enums.FileExceptionCode.FILE_NOT_FOUND;
+import static ru.jsms.backend.profile.enums.AuthExceptionCode.ACCOUNT_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
 public class FileService {
 
+    private final UserService userService;
     private final StorageService storageService;
     private final FileMetadataRepository fileMetadataRepository;
     private final HeadersDto headersDto;
 
-    public FileDto save(MultipartFile file) {
+    public FileDto save(MultipartFile file, Long ownerId) {
+        if (ownerId == null || !headersDto.isAdmin()) {
+            ownerId = headersDto.getUserId();
+        }
+        else if (userService.getById(ownerId).isEmpty()) {
+            throw ACCOUNT_NOT_FOUND.getException();
+        }
         FileMetadataEntity fileMetadata = FileMetadataEntity.builder()
                 .uuid(UUID.randomUUID())
                 .name(file.getOriginalFilename())
                 .size(file.getSize())
-                .ownerId(headersDto.getUserId())
+                .ownerId(ownerId)
                 .build();
         fileMetadataRepository.save(fileMetadata);
         storageService.save(file, fileMetadata.getUuid());

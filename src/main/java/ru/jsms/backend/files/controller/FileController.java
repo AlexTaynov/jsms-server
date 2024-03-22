@@ -26,8 +26,9 @@ public class FileController {
     private final FileService fileService;
 
     @PostMapping
-    public ResponseEntity<FileDto> saveFile(@RequestParam MultipartFile file) {
-        return ResponseEntity.ok(fileService.save(file));
+    public ResponseEntity<FileDto> saveFile(@RequestParam MultipartFile file,
+                                            @RequestParam(required = false) Long userId) {
+        return ResponseEntity.ok(fileService.save(file, userId));
     }
 
     @GetMapping(produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
