@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
@@ -22,6 +23,18 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CommonExceptionHandler {
     private final HttpServletRequest request;
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorDto> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
+        log.error(ex.toString(), ex);
+        final ErrorDto apiError = ErrorDto.builder()
+                .id(RequestUtils.getXRequestIdHeader(this.request))
+                .code("message_not_readable")
+                .message("Некорректное тело запроса")
+                .description(ex.getMessage())
+                .build();
+        return new ResponseEntity<>(apiError, HttpStatus.BAD_REQUEST);
+    }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorDto> handleException(Exception ex) {

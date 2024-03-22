@@ -8,7 +8,9 @@ import ru.jsms.backend.admin.entity.OfferArticleAnswer;
 import ru.jsms.backend.admin.repository.OfferArticleAnswerRepository;
 import ru.jsms.backend.files.service.FileService;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static ru.jsms.backend.admin.enums.AdminArticleExceptionCode.ANSWER_EDIT_DENIED;
+import static ru.jsms.backend.admin.enums.AdminArticleExceptionCode.ANSWER_NOT_COMPLETE;
 import static ru.jsms.backend.admin.enums.AdminArticleExceptionCode.ANSWER_NOT_FOUND;
 import static ru.jsms.backend.common.utils.UuidUtils.parseUuid;
 
@@ -21,8 +23,15 @@ public class OfferArticleAnswerService {
 
     public void submit(Long answerId) {
         OfferArticleAnswer answer = answerRepository.findById(answerId).orElseThrow(ANSWER_NOT_FOUND.getException());
+        validCompleteAnswer(answer);
         answer.setDraft(false);
         answerRepository.save(answer);
+    }
+
+    private void validCompleteAnswer(OfferArticleAnswer answer) {
+        if (answer.getDocumentId() == null && isBlank(answer.getComment())) {
+            throw ANSWER_NOT_COMPLETE.getException();
+        }
     }
 
     public OfferArticleAnswerResponse editAnswer(Long versionId, EditOfferArticleAnswerRequest request) {

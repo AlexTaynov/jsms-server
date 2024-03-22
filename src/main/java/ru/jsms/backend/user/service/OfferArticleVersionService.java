@@ -15,6 +15,8 @@ import ru.jsms.backend.user.entity.OfferArticleVersion;
 import ru.jsms.backend.user.repository.OfferArticleRepository;
 import ru.jsms.backend.user.repository.OfferArticleVersionRepository;
 
+import java.util.Optional;
+
 import static ru.jsms.backend.common.utils.BaseOwneredEntityUtils.validateAccess;
 import static ru.jsms.backend.common.utils.UuidUtils.parseUuid;
 import static ru.jsms.backend.user.enums.ArticleExceptionCode.OFFER_NOT_FOUND;
@@ -111,7 +113,7 @@ public class OfferArticleVersionService {
                 .documentsArchiveId(version.getDocumentsArchiveId())
                 .comment(version.getComment())
                 .isDraft(version.isDraft())
-                .answer(version.getAnswer() == null ? null : new OfferArticleAnswerResponse(version.getAnswer()))
+                .answer(Optional.ofNullable(version.getAnswer()).map(OfferArticleAnswerResponse::new).orElse(null))
                 .build();
     }
 

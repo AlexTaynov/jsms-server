@@ -11,9 +11,10 @@ import java.text.MessageFormat;
 @AllArgsConstructor
 public enum AdminArticleExceptionCode {
     ARTICLE_NOT_FOUND("article_not_found", "Статья не найдена", HttpStatus.NOT_FOUND),
-    STATUS_NOT_VALID("status_not_valid", "Такого статуса не существует", HttpStatus.BAD_REQUEST),
     ANSWER_NOT_FOUND("answer_not_found", "Ответ не найден", HttpStatus.BAD_REQUEST),
-    ANSWER_EDIT_DENIED("answer_edit_denied", "Ответ уже отправлен", HttpStatus.BAD_REQUEST)
+    ANSWER_EDIT_DENIED("answer_edit_denied", "Ответ уже отправлен", HttpStatus.BAD_REQUEST),
+    ANSWER_NOT_COMPLETE("answer_not_complete", "Должно быть заполнено хотя бы одно поле ответа",
+            HttpStatus.BAD_REQUEST)
     ;
 
     private final String errorCode;
