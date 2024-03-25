@@ -288,7 +288,7 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "localhost:8080/api/offerArticles/versions/1",
+									"raw": "localhost:8080/api/offerArticles/versions/7",
 									"host": [
 										"localhost"
 									],
@@ -297,7 +297,7 @@
 										"api",
 										"offerArticles",
 										"versions",
-										"1"
+										"7"
 									]
 								}
 							},
@@ -309,7 +309,7 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "localhost:8080/api/offerArticles/1/versions",
+									"raw": "localhost:8080/api/offerArticles/8/versions",
 									"host": [
 										"localhost"
 									],
@@ -317,7 +317,7 @@
 									"path": [
 										"api",
 										"offerArticles",
-										"1",
+										"8",
 										"versions"
 									]
 								}
@@ -450,6 +450,28 @@
 								}
 							},
 							"response": []
+						},
+						{
+							"name": "getVersions",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/api/admin/articles/1/versions",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"admin",
+										"articles",
+										"1",
+										"versions"
+									]
+								}
+							},
+							"response": []
 						}
 					],
 					"auth": {
@@ -503,7 +525,7 @@
 									}
 								},
 								"url": {
-									"raw": "localhost:8080/api/admin/offerArticles/answers?versionId=7",
+									"raw": "localhost:8080/api/admin/offerArticles/answers?versionId=8",
 									"host": [
 										"localhost"
 									],
@@ -517,7 +539,7 @@
 									"query": [
 										{
 											"key": "versionId",
-											"value": "7"
+											"value": "8"
 										}
 									]
 								}
@@ -530,7 +552,7 @@
 								"method": "POST",
 								"header": [],
 								"url": {
-									"raw": "localhost:8080/api/admin/offerArticles/answers/1/submit",
+									"raw": "localhost:8080/api/admin/offerArticles/answers/submit?versionId=8",
 									"host": [
 										"localhost"
 									],
@@ -540,8 +562,13 @@
 										"admin",
 										"offerArticles",
 										"answers",
-										"1",
 										"submit"
+									],
+									"query": [
+										{
+											"key": "versionId",
+											"value": "8"
+										}
 									]
 								}
 							},
@@ -587,6 +614,137 @@
 								}
 							},
 							"response": []
+						}
+					]
+				},
+				{
+					"name": "authors",
+					"item": [
+						{
+							"name": "create author",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"firstName\": \"Ivan\",\r\n    \"secondName\": \"Ivanov\",\r\n    \"patronymic\": \"Ivanovic\",\r\n    \"email\": \"ivanov@yandex.ru\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8080/api/authors",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"authors"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "get author",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/api/authors/2",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"authors",
+										"2"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "get authors",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/api/authors",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"authors"
+									],
+									"query": [
+										{
+											"key": "fullname",
+											"value": "Ivanov Ivan",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete author",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/api/authors/1",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"authors",
+										"1"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"auth": {
+						"type": "bearer",
+						"bearer": [
+							{
+								"key": "token",
+								"value": "{{accessToken}}",
+								"type": "string"
+							}
+						]
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
 						}
 					]
 				},
@@ -857,137 +1015,6 @@
 					"listen": "test",
 					"script": {
 						"type": "text/javascript",
-						"exec": [
-							""
-						]
-					}
-				}
-			]
-		},
-		{
-			"name": "authors",
-			"item": [
-				{
-					"name": "create author",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"firstName\": \"Ivan\",\r\n    \"secondName\": \"Ivanov\",\r\n    \"patronymic\": \"Ivanovic\",\r\n    \"email\": \"ivanov@yandex.ru\"\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "localhost:8080/api/authors",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"api",
-								"authors"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "get author",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "localhost:8080/api/authors/2",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"api",
-								"authors",
-								"2"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "get authors",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "localhost:8080/api/authors",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"api",
-								"authors"
-							],
-							"query": [
-								{
-									"key": "fullname",
-									"value": "Ivanov Ivan",
-									"disabled": true
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "delete author",
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "localhost:8080/api/authors/1",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"api",
-								"authors",
-								"1"
-							]
-						}
-					},
-					"response": []
-				}
-			],
-			"auth": {
-				"type": "bearer",
-				"bearer": [
-					{
-						"key": "token",
-						"value": "{{accessToken}}",
-						"type": "string"
-					}
-				]
-			},
-			"event": [
-				{
-					"listen": "prerequest",
-					"script": {
-						"type": "text/javascript",
-						"packages": {},
-						"exec": [
-							""
-						]
-					}
-				},
-				{
-					"listen": "test",
-					"script": {
-						"type": "text/javascript",
-						"packages": {},
 						"exec": [
 							""
 						]
