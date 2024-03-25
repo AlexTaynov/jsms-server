@@ -21,8 +21,8 @@ public class OfferArticleAnswerService {
     private final OfferArticleAnswerRepository answerRepository;
     private final FileService fileService;
 
-    public void submit(Long answerId) {
-        OfferArticleAnswer answer = answerRepository.findById(answerId).orElseThrow(ANSWER_NOT_FOUND.getException());
+    public void submit(Long versionId) {
+        OfferArticleAnswer answer = answerRepository.findByVersionId(versionId).orElseThrow(ANSWER_NOT_FOUND.getException());
         validCompleteAnswer(answer);
         answer.setDraft(false);
         answerRepository.save(answer);

@@ -3,7 +3,6 @@ package ru.jsms.backend.admin.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,9 +21,9 @@ public class OfferArticleAnswerController {
 
     private final OfferArticleAnswerService answerService;
 
-    @PostMapping("/{answerId}/submit")
-    public ResponseEntity<Void> submitAnswer(@PathVariable Long answerId) {
-        answerService.submit(answerId);
+    @PostMapping("/submit")
+    public ResponseEntity<Void> submitAnswer(@RequestParam Long versionId) {
+        answerService.submit(versionId);
         return ResponseEntity.ok().build();
     }
 

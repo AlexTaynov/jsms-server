@@ -17,6 +17,7 @@ import ru.jsms.backend.user.entity.OfferArticle;
 import ru.jsms.backend.user.entity.OfferArticleVersion;
 import ru.jsms.backend.user.repository.OfferArticleVersionRepository;
 
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static ru.jsms.backend.admin.enums.AdminArticleExceptionCode.ARTICLE_NOT_FOUND;
@@ -63,8 +64,8 @@ public class ArticleService {
                 .articleArchiveId(version.getArticleArchiveId())
                 .documentsArchiveId(version.getDocumentsArchiveId())
                 .comment(version.getComment())
-                .answer(new OfferArticleAnswerResponse(version.getAnswer()))
-                .review(new ReviewResponse(version.getReview()))
+                .answer(Optional.ofNullable(version.getAnswer()).map(OfferArticleAnswerResponse::new).orElse(null))
+                .review(Optional.ofNullable(version.getReview()).map(ReviewResponse::new).orElse(null))
                 .build();
     }
 
