@@ -5,12 +5,17 @@ import org.springframework.stereotype.Service;
 import ru.jsms.backend.admin.dto.request.EditArticleRequest;
 import ru.jsms.backend.admin.dto.response.ArticleFullResponse;
 import ru.jsms.backend.admin.dto.response.ArticleResponse;
+import ru.jsms.backend.admin.dto.response.ArticleVersionResponse;
+import ru.jsms.backend.admin.dto.response.OfferArticleAnswerResponse;
+import ru.jsms.backend.admin.dto.response.ReviewResponse;
 import ru.jsms.backend.admin.entity.Article;
 import ru.jsms.backend.admin.repository.ArticleRepository;
 import ru.jsms.backend.common.dto.PageDto;
 import ru.jsms.backend.common.dto.PageParam;
 import ru.jsms.backend.user.dto.response.AuthorResponse;
 import ru.jsms.backend.user.entity.OfferArticle;
+import ru.jsms.backend.user.entity.OfferArticleVersion;
+import ru.jsms.backend.user.repository.OfferArticleVersionRepository;
 
 import java.util.stream.Collectors;
 
@@ -21,6 +26,7 @@ import static ru.jsms.backend.admin.enums.AdminArticleExceptionCode.ARTICLE_NOT_
 public class ArticleService {
 
     private final ArticleRepository articleRepository;
+    private final OfferArticleVersionRepository versionRepository;
 
     public void createArticle(OfferArticle offerArticle) {
         var article = Article.builder().offerArticle(offerArticle).build();
@@ -41,6 +47,25 @@ public class ArticleService {
         article.setStatus(request.getStatus());
         article.setComment(request.getComment());
         return convertToFullResponse(articleRepository.save(article));
+    }
+
+    public PageDto<ArticleVersionResponse> getArticleVersions(Long articleId, PageParam pageParam) {
+        Article article = articleRepository.findById(articleId).orElseThrow(ARTICLE_NOT_FOUND.getException());
+        return new PageDto<>(
+                versionRepository.findByOfferArticleIdAndDraftIsFalse(
+                        article.getOfferArticle().getId(), pageParam.toPageable()).map(this::convertToResponse)
+        );
+    }
+
+    private ArticleVersionResponse convertToResponse(OfferArticleVersion version) {
+        return ArticleVersionResponse.builder()
+                .id(version.getId())
+                .articleArchiveId(version.getArticleArchiveId())
+                .documentsArchiveId(version.getDocumentsArchiveId())
+                .comment(version.getComment())
+                .answer(new OfferArticleAnswerResponse(version.getAnswer()))
+                .review(new ReviewResponse(version.getReview()))
+                .build();
     }
 
     private ArticleResponse convertToResponse(Article article) {

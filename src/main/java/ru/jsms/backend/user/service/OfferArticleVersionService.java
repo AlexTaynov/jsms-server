@@ -4,7 +4,6 @@ import liquibase.repackaged.org.apache.commons.lang3.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.jsms.backend.admin.dto.response.OfferArticleAnswerResponse;
-import ru.jsms.backend.admin.dto.response.ReviewResponse;
 import ru.jsms.backend.common.dto.HeadersDto;
 import ru.jsms.backend.common.dto.PageDto;
 import ru.jsms.backend.common.dto.PageParam;
@@ -20,9 +19,9 @@ import java.util.Optional;
 
 import static ru.jsms.backend.common.utils.BaseOwneredEntityUtils.validateAccess;
 import static ru.jsms.backend.common.utils.UuidUtils.parseUuid;
-import static ru.jsms.backend.user.enums.ArticleExceptionCode.OFFER_NOT_FOUND;
 import static ru.jsms.backend.user.enums.ArticleExceptionCode.EDIT_DENIED;
 import static ru.jsms.backend.user.enums.ArticleExceptionCode.OFFER_NOT_COMPLETE;
+import static ru.jsms.backend.user.enums.ArticleExceptionCode.OFFER_NOT_FOUND;
 import static ru.jsms.backend.user.enums.ArticleExceptionCode.SINGLE_VERSION_DELETE;
 import static ru.jsms.backend.user.enums.ArticleExceptionCode.VERSION_NOT_COMPLETE;
 import static ru.jsms.backend.user.enums.ArticleExceptionCode.VERSION_NOT_DIFFERENT;
@@ -83,7 +82,7 @@ public class OfferArticleVersionService {
             fileService.validateAccess(request.getDocumentsArchiveId());
         }
 
-        if(!version.isDraft()) {
+        if (!version.isDraft()) {
             var offerArticle = version.getOfferArticle();
             version = OfferArticleVersion.builder().offerArticle(offerArticle).ownerId(headersDto.getUserId()).build();
         }
@@ -114,8 +113,8 @@ public class OfferArticleVersionService {
                 .documentsArchiveId(version.getDocumentsArchiveId())
                 .comment(version.getComment())
                 .isDraft(version.isDraft())
-                .answer(Optional.ofNullable(version.getAnswer()).map(OfferArticleAnswerResponse::new).orElse(null))
-                .review(Optional.ofNullable(version.getReview()).map(ReviewResponse::new).orElse(null))
+                .answer(Optional.ofNullable(version.getAnswer()).filter(answer -> !answer.isDraft())
+                        .map(OfferArticleAnswerResponse::new).orElse(null))
                 .build();
     }
 
