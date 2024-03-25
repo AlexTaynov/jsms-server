@@ -14,6 +14,10 @@ import java.util.Optional;
 public interface OfferArticleVersionRepository extends BaseOwneredRepository<OfferArticleVersion, Long> {
 
     @Transactional(readOnly = true)
+    @Query("select o from OfferArticleVersion o where o.offerArticle.id = ?1 and o.isDraft = false and o.deleted = false")
+    Page<OfferArticleVersion> findByOfferArticleIdAndDraftIsFalse(Long offerArticleId, Pageable pageable);
+
+    @Transactional(readOnly = true)
     @Query("select o from OfferArticleVersion o where o.offerArticle.id = ?1 and o.ownerId = ?2 and o.deleted = false")
     Page<OfferArticleVersion> findByOfferArticleIdAndOwnerId(Long offerArticleId, Long userId, Pageable pageable);
 

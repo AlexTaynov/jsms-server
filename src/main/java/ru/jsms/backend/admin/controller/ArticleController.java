@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.jsms.backend.admin.dto.request.EditArticleRequest;
 import ru.jsms.backend.admin.dto.response.ArticleFullResponse;
 import ru.jsms.backend.admin.dto.response.ArticleResponse;
+import ru.jsms.backend.admin.dto.response.ArticleVersionResponse;
 import ru.jsms.backend.admin.service.ArticleService;
 import ru.jsms.backend.common.dto.PageDto;
 import ru.jsms.backend.common.dto.PageParam;
@@ -38,6 +39,12 @@ public class ArticleController {
     public ResponseEntity<ArticleFullResponse> editArticle(@PathVariable Long articleId,
                                                        @RequestBody EditArticleRequest request) {
         return ResponseEntity.ok(articleService.editArticle(articleId, request));
+    }
+
+    @GetMapping("/{articleId}/versions")
+    public ResponseEntity<PageDto<ArticleVersionResponse>> getArticleVersions(@PathVariable Long articleId,
+                                                                              PageParam pageParam) {
+        return ResponseEntity.ok(articleService.getArticleVersions(articleId, pageParam));
     }
 
 }
