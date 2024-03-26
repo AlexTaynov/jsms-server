@@ -1,5 +1,27 @@
 version: '3'
 services:
+  jsms-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
+    depends_on:
+      - postgres
+      - minio
+      - elasticsearch
+      - logstash
+      - kibana
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/jsms_db
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+      - SPRING_MAIL_USERNAME=username
+      - SPRING_MAIL_PASSWORD=password
+      - MINIO_URL=http://minio:9000
+      - MINIO_USERNAME=minio
+      - MINIO_PASSWORD=minio_pass
   postgres:
     image: postgres:15.6-alpine
     restart: always
