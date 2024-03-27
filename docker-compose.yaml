@@ -22,6 +22,10 @@ services:
       - MINIO_URL=http://minio:9000
       - MINIO_USERNAME=minio
       - MINIO_PASSWORD=minio_pass
+    logging:
+      driver: gelf
+      options:
+        gelf-address: "udp://127.0.0.1:12201"
   postgres:
     image: postgres:15.6-alpine
     restart: always
@@ -76,13 +80,11 @@ services:
     image: logstash:8.3.3
     container_name: logstash_springboot
     volumes:
-      - ./logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
-      - ./logstash/pipeline:/usr/share/logstash/pipeline:ro
+      - ./logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
+      - ./logstash/pipeline:/usr/share/logstash/pipeline
     ports:
+      - "12201:12201/udp"
       - "5044:5044"
-      - "5000:5000/tcp"
-      - "5000:5000/udp"
-      - "9600:9600"
     environment:
       LS_JAVA_OPTS: "-Xmx256m -Xms256m"
     networks:
