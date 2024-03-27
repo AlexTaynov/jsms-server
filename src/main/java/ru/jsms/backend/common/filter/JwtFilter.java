@@ -3,6 +3,7 @@ package ru.jsms.backend.common.filter;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -36,6 +37,7 @@ public class JwtFilter extends GenericFilterBean {
             final JwtAuthentication jwtInfoToken = JwtUtils.generate(claims);
             jwtInfoToken.setAuthenticated(true);
             SecurityContextHolder.getContext().setAuthentication(jwtInfoToken);
+            MDC.put("userId", String.valueOf(jwtInfoToken.getUserId()));
         }
         fc.doFilter(request, response);
     }

@@ -142,4 +142,8 @@ public class OfferArticleVersionService {
         version.setDocumentsArchiveId(parseUuid(request.getDocumentsArchiveId()));
         version.setComment(request.getComment());
     }
+
+    public Optional<OfferArticleVersion> findById(Long versionId) {
+        return versionRepository.findById(versionId);
+    }
 }
